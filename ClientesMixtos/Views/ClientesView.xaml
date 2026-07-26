@@ -1,0 +1,165 @@
+﻿<UserControl x:Class="ClientesMixtos.Views.ClientesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ClientesMixtos.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="550" d:DesignWidth="1050"
+             Background="{DynamicResource BrushWindowBg}">
+
+    <Border Background="{DynamicResource BrushCardBg}" CornerRadius="12" Effect="{StaticResource CardShadow}"
+            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" Margin="24">
+
+                <Grid Margin="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Background="{DynamicResource BrushSurfaceLight}" CornerRadius="12,12,0,0"
+                    BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1">
+                <DockPanel Margin="16,12">
+                    <TextBox Width="240" Height="34"
+                             VerticalContentAlignment="Center"
+                             Style="{StaticResource ModernTextBoxStyle}"
+                             Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Text="Lote:" VerticalAlignment="Center"
+                               FontWeight="SemiBold" Foreground="{DynamicResource BrushTextMuted}"
+                               Margin="12,0,6,0" FontSize="13"/>
+
+                    <ComboBox Width="100" Height="34" Margin="0,0,12,0"
+                              Style="{StaticResource ModernComboBox}"
+                              ItemsSource="{Binding Lotes}"
+                              SelectedItem="{Binding LoteSeleccionado}" />
+
+                    <Button Content="+ Nuevo Lote" Style="{StaticResource OutlineButtonStyle}"
+                             Width="110" Height="32" Margin="0,0,8,0"
+                             Command="{Binding NewLoteCommand}"/>
+
+                    <Button Content="+ Nuevo Cliente" Style="{StaticResource ActionButtonStyle}"
+                            Width="110" Height="32" Margin="0,0,8,0"
+                            HorizontalAlignment="Right"
+                            Command="{Binding AddCommand}"/>
+                </DockPanel>
+            </Border>
+
+            <DataGrid Grid.Row="1"
+                      ItemsSource="{Binding CClientesView}"
+                      SelectedItem="{Binding ClienteSeleccionado}"
+                      Style="{StaticResource ModernDataGrid}">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Lote" Width="60" Binding="{Binding Lote}"
+                        CellStyle="{StaticResource FirstCellStyle}"/>
+                    <DataGridTextColumn Header="Libro 1" Width="60" Binding="{Binding Libro1}" />
+                    <DataGridTextColumn Header="Libro 2" Width="60" Binding="{Binding Libro2}" />
+                    <DataGridTextColumn Header="Nombre" Width="60" Binding="{Binding Nombre}" />
+                    <DataGridTextColumn Header="Teléfono" Width="100" Binding="{Binding Telefono}" />
+                    <DataGridTextColumn Header="Ciudad" Width="90" Binding="{Binding Ciudad}" />
+                    <DataGridTextColumn Header="Vehículo" Width="110" Binding="{Binding Vehiculo}" />
+                    <DataGridTextColumn Header="Placa" Width="80" Binding="{Binding Placa}" />
+                    <DataGridTextColumn Header="Compra" Width="80"
+                        Binding="{Binding State.FechaDeCompra, StringFormat=dd/MM/yyyy}" />
+                    <DataGridTextColumn Header="Pago" Width="80"
+                        Binding="{Binding State.FechaDePago, StringFormat=dd/MM/yyyy}" />
+                    <DataGridTextColumn Header="Vence" Width="80"
+                        Binding="{Binding State.FechaVence, StringFormat=dd/MM/yyyy}" />
+                    <DataGridTextColumn Header="Últ. marcada" Width="80"
+                        Binding="{Binding State.FechaMarcada, StringFormat=dd/MM/yyyy}" />
+                    <DataGridTextColumn Header="Atraso" Width="60"
+                        Binding="{Binding State.MesesAtrasadoText}"/>
+                    <DataGridTextColumn Header="Refrenda" Width="70" Binding="{Binding Refrenda}" />
+
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Border Grid.Row="2" Background="{DynamicResource BrushSurfaceLight}" CornerRadius="0,0,12,12"
+                    BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,1,0,0" Padding="16,10">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Notas" Width="80" Height="32" Margin="4,0"
+                            Command="{Binding NotesCommand}"
+                            CommandParameter="{Binding ClienteSeleccionado}"
+                            IsEnabled="{Binding HasSelectedClient}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                                <Setter Property="Background" Value="#9CA3AF"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="True">
+                                        <Setter Property="Background" Value="#8B5CF6"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Content="Pagos" Width="80" Height="32" Margin="4,0"
+                            Command="{Binding PagosCommand}"
+                            CommandParameter="{Binding ClienteSeleccionado}"
+                            IsEnabled="{Binding HasSelectedClient}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                                <Setter Property="Background" Value="#9CA3AF"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="True">
+                                        <Setter Property="Background" Value="#F59E0B"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Content="Editar" Width="80" Height="32" Margin="4,0"
+                            Command="{Binding EditCommand}"
+                            CommandParameter="{Binding ClienteSeleccionado}"
+                            IsEnabled="{Binding HasSelectedClient}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                                <Setter Property="Background" Value="#9CA3AF"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="True">
+                                        <Setter Property="Background" Value="#2563EB"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Content="Eliminar" Width="80" Height="32" Margin="4,0"
+                            Command="{Binding DeleteCommand}"
+                            CommandParameter="{Binding ClienteSeleccionado}"
+                            IsEnabled="{Binding HasSelectedClient}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                                <Setter Property="Background" Value="#9CA3AF"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="True">
+                                        <Setter Property="Background" Value="#EF4444"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Content="Marcar" Width="80" Height="32" Margin="4,0"
+                            Command="{Binding MarkCommand}"
+                            CommandParameter="{Binding ClienteSeleccionado}"
+                            IsEnabled="{Binding HasSelectedClient}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                                <Setter Property="Background" Value="#9CA3AF"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="True">
+                                        <Setter Property="Background" Value="#10B981"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

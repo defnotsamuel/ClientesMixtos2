@@ -1,0 +1,44 @@
+﻿<Window x:Class="ClientesMixtos.Views.NewPinView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClientesMixtos.Views"
+        xmlns:vm="clr-namespace:ClientesMixtos.ViewModels"
+        mc:Ignorable="d"
+        Title="Clientes Mixtos - Nuevo PIN" Height="380" Width="380" MinHeight="350" MinWidth="380"
+        ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushWindowBg}">
+
+    <Border Background="{DynamicResource BrushCardBg}" CornerRadius="12" Effect="{StaticResource CardShadow}"
+            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" Margin="20">
+        <Grid>
+            <StackPanel Margin="28,24">
+
+                <TextBlock Text="Configurar PIN" 
+                           FontSize="18" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="Cree un nuevo PIN de acceso" 
+                           FontSize="12" FontWeight="Medium" Foreground="{DynamicResource BrushTextSecondary}"
+                           HorizontalAlignment="Center" Margin="0,4,0,20"/>
+
+                <TextBlock Text="Usuario" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                <TextBox Height="34"
+                         VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                          Text="{Binding Usuario, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource ModernTextBoxStyle}"/>
+
+                <TextBlock Text="PIN" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,14,0,4"/>
+                <PasswordBox Height="34"
+                             VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                             x:Name="PasswordBox"
+                             Style="{StaticResource ModernPasswordBoxStyle}"/>
+
+                <Button Content="Crear" Height="36" Foreground="White"
+                        Margin="0,20,0,0"
+                        Command="{Binding AddPinCommand}" CommandParameter="{Binding ElementName=PasswordBox}"
+                        Style="{StaticResource ActionButtonStyle}" IsDefault="True"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

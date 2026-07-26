@@ -1,0 +1,171 @@
+﻿<UserControl x:Class="ClientesMixtos.Views.PanelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ClientesMixtos.Views"
+             xmlns:vm="clr-namespace:ClientesMixtos.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1050"
+              Background="{DynamicResource BrushWindowBg}">
+
+    <Grid Margin="24" Background="{DynamicResource BrushWindowBg}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="220"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Background="{DynamicResource BrushCardBg}" CornerRadius="12" Effect="{StaticResource CardShadow}"
+                BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="56"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Border Background="{DynamicResource BrushSurfaceLight}" CornerRadius="12,12,0,0"
+                        BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1">
+                    <DockPanel Margin="20,0">
+                        <TextBlock Text="{Binding CurrentMonth}" 
+                                   FontSize="18" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="Pendientes"
+                                   FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextMuted}"
+                                   VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    </DockPanel>
+                </Border>
+
+                <DataGrid Grid.Row="1"
+                    Style="{StaticResource ModernDataGrid}"
+                    Margin="0"
+                    ItemsSource="{Binding PendingClientesView}"
+                    AutoGenerateColumns="False">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Lote" Width="70"
+                            Binding="{Binding Lote}"
+                            CellStyle="{StaticResource FirstCellStyle}"/>
+                        <DataGridTextColumn Header="Libro 1" Width="70"
+                            Binding="{Binding Libro1}"/>
+                        <DataGridTextColumn Header="Libro 2" Width="70"
+                            Binding="{Binding Libro2}"/>
+                        <DataGridTextColumn Header="Nombre" Width="*"
+                            Binding="{Binding Nombre}"/>
+                        <DataGridTextColumn Header="Vehículo" Width="100"
+                            Binding="{Binding Vehiculo}"/>
+                        <DataGridTextColumn Header="Placa" Width="90"
+                            Binding="{Binding Placa}"/>
+                        <DataGridTextColumn Header="Compra" Width="90"
+                            Binding="{Binding State.FechaDeCompra, StringFormat=dd/MM/yyyy}"/>
+                        <DataGridTextColumn Header="Pago" Width="90"
+                            Binding="{Binding State.FechaDePago, StringFormat=dd/MM/yyyy}"/>
+                        <DataGridTextColumn Header="Últ. marcada" Width="90"
+                            Binding="{Binding State.FechaMarcada, StringFormat=dd/MM/yyyy}"/>
+                        <DataGridTextColumn Header="Vence" Width="90"
+                            Binding="{Binding State.FechaVence, StringFormat=dd/MM/yyyy}"/>
+                        <DataGridTextColumn Header="Atraso" Width="60"
+                            Binding="{Binding State.MesesAtrasadoText}"/>
+                        <DataGridTemplateColumn Header="" Width="80">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Marcar"
+                                             Width="65" Height="28"
+                                             Command="{Binding DataContext.MarkCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                             CommandParameter="{Binding}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                                                <Setter Property="IsEnabled" Value="True"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding State.MarcadoEsteMes}" Value="True">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Background" Value="#9CA3AF"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Border Grid.Row="2" Background="{DynamicResource BrushSurfaceLight}" CornerRadius="0,0,12,12"
+                        BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,1,0,0">
+                    <DockPanel Margin="16,10">
+                        <TextBlock Text="Buscar" FontSize="12" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrushTextMuted}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Width="220" Height="32"
+                                 Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
+                                 HorizontalAlignment="Left" Style="{StaticResource ModernTextBoxStyle}"/>
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Column="1" Margin="16,0,0,0">
+            <Border Style="{StaticResource StatCardStyle}" Height="100">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="Total Clientes"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding TotalClientes}"
+                               FontSize="30" FontWeight="Bold"
+                               Foreground="#2563EB"
+                               Margin="0,4,0,0"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource StatCardStyle}" Height="100" Margin="0,10,0,0">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="Pendientes"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Este mes"
+                               FontSize="10" FontWeight="Medium"
+                               Foreground="{DynamicResource BrushTextDisabled}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding TotalPendingClientes}"
+                               FontSize="30" FontWeight="Bold"
+                               Foreground="#EF4444"
+                               Margin="0,4,0,0"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource StatCardStyle}" Height="100" Margin="0,10,0,0">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="Recuperados"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding TotalRecuperados}"
+                               FontSize="30" FontWeight="Bold"
+                               Foreground="#10B981"
+                               Margin="0,4,0,0"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource StatCardStyle}" Height="100" Margin="0,10,0,0">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="Perdidos"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource BrushTextMuted}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding TotalPerdidos}"
+                               FontSize="30" FontWeight="Bold"
+                               Foreground="#F59E0B"
+                               Margin="0,4,0,0"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+
+        </StackPanel>
+    </Grid>
+</UserControl>

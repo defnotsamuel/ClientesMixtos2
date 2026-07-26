@@ -1,0 +1,112 @@
+﻿<Window x:Class="ClientesMixtos.Views.AddClienteView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClientesMixtos.Views"
+        mc:Ignorable="d"
+        Title="Agregar nuevo cliente" Height="680" MinHeight="560" Width="820" MinWidth="700" WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BrushWindowBg}">
+
+    <Border Background="{DynamicResource BrushCardBg}" CornerRadius="12" Effect="{StaticResource CardShadow}"
+            BorderBrush="{DynamicResource BrushBorderLight}" BorderThickness="1" Margin="16">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="32,28">
+
+                <TextBlock Text="Nuevo Cliente" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}"/>
+
+                <Border Background="{DynamicResource BrushSurfaceLight}" CornerRadius="8" Margin="0,20,0,0"
+                        BorderBrush="{DynamicResource BrushBorderLight}" BorderThickness="1">
+                    <StackPanel Margin="20">
+
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Margin="0,0,20,0">
+                                <TextBlock Text="LOTE" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                                <ComboBox Width="100" Height="34"
+                                          ItemsSource="{Binding Lotes}" 
+                                          SelectedItem="{Binding Lote}" 
+                                          HorizontalAlignment="Left" Style="{StaticResource ModernComboBox}"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,20,0">
+                                <TextBlock Text="LIBRO 1" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                                <TextBox Width="100" Height="34" Text="{Binding Libro1, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Style="{StaticResource ModernTextBoxStyle}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="LIBRO 2" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                                <TextBox Width="100" Height="34" Text="{Binding Libro2, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Style="{StaticResource ModernTextBoxStyle}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,16,0,0">
+                            <TextBlock Text="NOMBRE" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                            <TextBox Height="34" Text="{Binding Nombre, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <StackPanel Margin="0,0,20,0">
+                                <TextBlock Text="VEHÍCULO" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                                <TextBox Width="300" Height="34" Text="{Binding Vehiculo, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Style="{StaticResource ModernTextBoxStyle}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="PLACA" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                                <TextBox Width="120" Height="34" Text="{Binding Placa, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Style="{StaticResource ModernTextBoxStyle}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,16,0,0">
+                            <TextBlock Text="TELÉFONO" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                            <TextBox Height="34" Text="{Binding Telefono, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,16,0,0">
+                            <TextBlock Text="CIUDAD" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                            <TextBox Height="34" Text="{Binding Ciudad, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,16,0,0">
+                            <TextBlock Text="REFRENDA" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                            <TextBox Height="34" Text="{Binding Refrenda, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="FECHA DE COMPRA" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                                <TextBox Width="140" Height="34" Text="{Binding FechaDeCompra, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="FECHA DE PAGO" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                                <TextBox Width="120" Height="34" Text="{Binding FechaDePago, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="FECHA DE VENCIMIENTO" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                                <TextBox Width="140" Height="34" Text="{Binding FechaVence, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="ÚLTIMA FECHA MARCADA" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,0,4"/>
+                                <TextBox Width="140" Height="34" Text="{Binding FechaMarcada, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                            <RadioButton IsChecked="True" Content="NINGUNO"
+                                         FontWeight="SemiBold" Margin="0,0,24,0" FontSize="14"
+                                         Style="{StaticResource ModernRadioButtonStyle}"/>
+                            <RadioButton IsChecked="{Binding Perdido}" Content="PERDIDO"
+                                         FontWeight="SemiBold" Margin="0,0,24,0" FontSize="14"
+                                         Style="{StaticResource ModernRadioButtonStyle}"/>
+                            <RadioButton IsChecked="{Binding Recuperado}" Content="RECUPERADO"
+                                         FontWeight="SemiBold" FontSize="14"
+                                         Style="{StaticResource ModernRadioButtonStyle}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Button Style="{StaticResource ActionButtonStyle}" Content="Guardar"
+                        Width="180" Height="42" Margin="0,24,0,0"
+                        HorizontalAlignment="Center"
+                        Command="{Binding SaveCommand}"
+                        FontSize="14" FontWeight="SemiBold" IsDefault="True"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</Window>
