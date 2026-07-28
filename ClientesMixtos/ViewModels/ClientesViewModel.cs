@@ -22,7 +22,7 @@ namespace ClientesMixtos.ViewModels
         private readonly NotaService _notaService;
         private readonly PagoService _pagoService;
 
-        public ObservableCollection<Cliente> _clientes;
+        public ObservableCollection<Cliente> _clientes = [];
         public ObservableCollection<string> Lotes { get; } = [];
         public ICollectionView CClientesView { get; set; }
 
@@ -73,7 +73,6 @@ namespace ClientesMixtos.ViewModels
                 await _clienteService.AddCliente(cliente);
 
                 _clientes.Add(cliente);
-                CClientesView.Refresh();
             }
         }
 
@@ -89,7 +88,6 @@ namespace ClientesMixtos.ViewModels
             await _clienteService.DeleteCliente(cliente);
 
             _clientes.Remove(cliente);
-            CClientesView.Refresh();
         }
 
         [RelayCommand]
@@ -157,7 +155,7 @@ namespace ClientesMixtos.ViewModels
             var pagosView = new PagosDialog(vm);
             pagosView.ShowDialog();
 
-            await RealoadDataAsync();
+            CClientesView.Refresh();
         }
 
         public ClientesViewModel(ClienteService clienteService, NotaService notaService, PagoService pagoService)
@@ -166,32 +164,7 @@ namespace ClientesMixtos.ViewModels
             _notaService = notaService;
             _pagoService = pagoService;
 
-            _clientes = [];
             CClientesView = CollectionViewSource.GetDefaultView(_clientes);
-        }
-
-        public async Task RealoadDataAsync()
-        {
-            try
-            {
-                var clientes = await _clienteService.GetAll();
-
-                await Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    _clientes = new(clientes);
-
-                    CClientesView.Refresh();
-                    OnPropertyChanged(nameof(Lotes));
-                });
-            }
-            catch
-            {
-
-                throw;
-                // BD desconectada — los datos se cargarán al reconectar
-            }
-
-            return;
         }
 
         public async Task LoadDataAsync()
@@ -202,29 +175,25 @@ namespace ClientesMixtos.ViewModels
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    _clientes = new(clientes);
-                    CClientesView = CollectionViewSource.GetDefaultView(clientes);
-
 
                     Lotes.Clear();
                     Lotes.Add("Todos");
 
-                    foreach (var c in clientes)
+                    foreach (var cliente in clientes)
                     {
-                        string lote = c.Lote;
+                        string lote = cliente.Lote;
                         if (!Lotes.Contains(lote))
                             Lotes.Add(lote);
+
+                        _clientes.Add(cliente);
                     }
 
                     OnPropertyChanged(nameof(Lotes));
-                    OnPropertyChanged(nameof(CClientesView));
                 });
             }
             catch
             {
-
                 throw;
-                // BD desconectada — los datos se cargarán al reconectar
             }
 
             return;

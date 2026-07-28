@@ -48,11 +48,20 @@ namespace ClientesMixtos.Services
 
             var pagos = new List<Pago>();
 
-            DateTime primerPago = DateUtils.Utils.CrearFechaValida(
-                cliente.State.FechaDeCompra.Value,
-                cliente.State.FechaDeCompra.Value.Day);
+            DateTime hoy = DateTime.Today;
+            int diaPago = cliente.State.FechaDeCompra.Value.Day;
 
-            for (DateTime pago = cliente.State.FechaDePago.Value.AddMonths(-1);
+            DateTime primerPago = new(
+                hoy.Year,
+                7,
+                Math.Min(diaPago, DateTime.DaysInMonth(hoy.Year, 7)));
+
+            DateTime ultimoPago = cliente.State.FechaDePago.Value.AddMonths(-1);
+
+            if (ultimoPago < primerPago)
+                return;
+
+            for (DateTime pago = ultimoPago;
                  pago >= primerPago;
                  pago = pago.AddMonths(-1))
             {
@@ -65,7 +74,10 @@ namespace ClientesMixtos.Services
             }
 
             if (pagos.Count > 0)
+            {
+                pagos.Reverse(); // Opcional: guardar de julio hacia adelante
                 await _repository.InsertMany(pagos);
+            }
         }
 
         public Task EliminarPago(ObjectId id)

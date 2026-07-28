@@ -35,10 +35,11 @@ namespace ClientesMixtos.Services
 
         public async Task AddCliente(Cliente cliente)
         {
-            CargarFechas(cliente);
-            await CalculateFechaDePago(cliente);
-
             await clienteRepository.InsertCliente(cliente);
+
+            CargarFechas(cliente);
+
+            await CalculateFechaDePago(cliente);
             await pagoService.CrearHistorialInicial(cliente);
 
             await CargarEstados(cliente);
