@@ -1,13 +1,13 @@
-﻿using ClientesMixtos.Repositories;
+﻿using ClientesMixtos.Repos;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ClientesMixtos.Services
 {
-    public class PasswordService(PasswordRepository passwordRepository)
+    public class PasswordService(PasswordRepo passwordRepository)
     {
-        private readonly PasswordRepository _passwordRepository = passwordRepository;
+        private readonly PasswordRepo _passwordRepository = passwordRepository;
 
         private static string EncryptPin(string pin)
         {
@@ -19,6 +19,16 @@ namespace ClientesMixtos.Services
         public Task<List<Models.Password>> GetAll()
         {
             return _passwordRepository.GetAll();
+        }
+
+        public async Task<bool> ThereUsers()
+        {
+            var passwords = await GetAll();
+
+            if (passwords.Count > 0)
+                return true;
+
+            return false;
         }
 
         public async Task<bool> SavePassword(string pin, string user)

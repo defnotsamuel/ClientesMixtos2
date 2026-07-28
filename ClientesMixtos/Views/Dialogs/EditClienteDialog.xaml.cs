@@ -1,11 +1,11 @@
 ﻿using System.Windows;
 
-namespace ClientesMixtos.Views
+namespace ClientesMixtos.Views.Dialogs
 {
-    public partial class EditView : Window
+    public partial class EditClienteDialog : Window
     {
 
-        public EditView(
+        public EditClienteDialog(
             ViewModels.EditViewModel editViewModel)
         {
 

@@ -1,5 +1,5 @@
 ﻿using ClientesMixtos.Models;
-using ClientesMixtos.Repositories;
+using ClientesMixtos.Repos;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace ClientesMixtos.Services
 {
-    public class NotaService(NotaRepository notaRepository)
+    public class NotaService(NotaRepo notaRepository)
     {
-        private readonly NotaRepository _notaRepository = notaRepository;
+        private readonly NotaRepo _notaRepository = notaRepository;
 
         public async Task<List<Nota>> FromClient(Cliente cliente)
         {

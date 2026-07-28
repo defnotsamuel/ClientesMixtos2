@@ -44,8 +44,7 @@
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Lote" Width="70"
-                            Binding="{Binding Lote}"
-                            CellStyle="{StaticResource FirstCellStyle}"/>
+                            Binding="{Binding Lote}"/>
                         <DataGridTextColumn Header="Libro 1" Width="70"
                             Binding="{Binding Libro1}"/>
                         <DataGridTextColumn Header="Libro 2" Width="70"

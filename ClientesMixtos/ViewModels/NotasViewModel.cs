@@ -1,6 +1,6 @@
 ﻿using ClientesMixtos.Models;
 using ClientesMixtos.Services;
-using ClientesMixtos.Views;
+using ClientesMixtos.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -34,7 +34,7 @@ namespace ClientesMixtos.ViewModels
         private async Task Crear()
         {
             var vm = new NotaFormViewModel();
-            var ventana = new NotaFormWindow(vm) { Title = "NUEVA NOTA"};
+            var ventana = new NewNotaDialog(vm) { Title = "NUEVA NOTA"};
 
             if (ventana.ShowDialog() == true && vm.NotaResultado is not null)
             {
@@ -47,7 +47,7 @@ namespace ClientesMixtos.ViewModels
         private async Task Editar()
         {
             var vm = new NotaFormViewModel(NotaSeleccionada);
-            var ventana = new NotaFormWindow(vm) { Title = "EDITAR NOTA" };
+            var ventana = new NewNotaDialog(vm) { Title = "EDITAR NOTA" };
 
             if (ventana.ShowDialog() == true && vm.NotaResultado is not null)
             {

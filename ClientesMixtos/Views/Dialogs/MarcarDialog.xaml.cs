@@ -2,11 +2,11 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 
-namespace ClientesMixtos.Views
+namespace ClientesMixtos.Views.Dialogs
 {
-    public partial class MarcarDialogView : Window
+    public partial class MarcarDialog : Window
     {
-        public MarcarDialogView(ViewModels.MarcarDialogViewModel vm)
+        public MarcarDialog(ViewModels.MarcarDialogViewModel vm)
         {
             InitializeComponent();
 

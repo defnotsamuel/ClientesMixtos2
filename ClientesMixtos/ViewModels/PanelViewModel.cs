@@ -1,8 +1,9 @@
 ﻿using ClientesMixtos.Models;
 using ClientesMixtos.Services;
-using ClientesMixtos.Views;
+using ClientesMixtos.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,8 +19,9 @@ namespace ClientesMixtos.ViewModels
 {
     public partial class PanelViewModel: ObservableObject
     {
+
         private readonly ClienteService _clienteService;
-        private readonly ObservableCollection<Cliente> _pendingClientes;
+        private ObservableCollection<Cliente> _pendingClientes;
 
         [ObservableProperty]
         private int _totalClientes;
@@ -46,6 +48,7 @@ namespace ClientesMixtos.ViewModels
                 );
             }
         }
+
         public ICollectionView PendingClientesView { get; set; }
 
         [RelayCommand]
@@ -58,12 +61,12 @@ namespace ClientesMixtos.ViewModels
             }
 
             var dialogVm = new MarcarDialogViewModel();
-            var dialog = new MarcarDialogView(dialogVm);
+            var dialog = new MarcarDialog(dialogVm);
             if (dialog.ShowDialog() != true) return;
 
             await _clienteService.MarcarCliente(cliente, dialogVm.Meses);
-            PendingClientesView.Refresh();
 
+            PendingClientesView.Refresh();
             TotalPendingClientes--;
         }
 
@@ -81,6 +84,7 @@ namespace ClientesMixtos.ViewModels
         public PanelViewModel(ClienteService service)
         {
             _clienteService = service;
+
             _pendingClientes = [];
             PendingClientesView = CollectionViewSource.GetDefaultView(_pendingClientes);
         }
@@ -93,17 +97,15 @@ namespace ClientesMixtos.ViewModels
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
+                    _pendingClientes = new ObservableCollection<Cliente>(FilterClientsByCurrentMonth(clientes));
+
+                    PendingClientesView = CollectionViewSource.GetDefaultView(_pendingClientes);
+                    OnPropertyChanged(nameof(PendingClientesView));
+
                     TotalClientes = clientes.Count;
-
-                    foreach (var c in FilterClientsByCurrentMonth(clientes))
-                    {
-                        _pendingClientes.Add(c);
-                    }
-
                     TotalPendingClientes = _pendingClientes.Count(c => !c.State.MarcadoEsteMes);
                     TotalPerdidos = clientes.Count(c => c.Perdido);
                     TotalRecuperados = clientes.Count(c => c.Recuperado);
-                    PendingClientesView.Refresh();
                 });
             }
             catch

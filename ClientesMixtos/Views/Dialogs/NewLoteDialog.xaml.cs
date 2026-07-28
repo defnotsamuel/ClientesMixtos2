@@ -1,12 +1,13 @@
 ﻿using System.Windows;
 
-namespace ClientesMixtos.Views
+namespace ClientesMixtos.Views.Dialogs
 {
-    public partial class AddClienteView : Window
+    public partial class NewLoteDialog : Window
     {
-        public AddClienteView(ViewModels.AddClienteViewModel vm)
+        public NewLoteDialog(ViewModels.NewLoteViewModel vm)
         {
             InitializeComponent();
+
             DataContext = vm;
 
             vm.CloseRequested += ((r) => DialogResult = r);

@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
-using System;
+using ClientesMixtos.Views.Dialogs;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,10 +11,10 @@ using ClientesMixtos.Views;
 
 namespace ClientesMixtos.ViewModels
 {
-    public partial class PinViewModel : ObservableObject
+    public partial class PinViewModel(PasswordService passwordService, IServiceProvider serviceProvider) : ObservableObject
     {
-        private readonly PasswordService _passwordService;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly PasswordService _passwordService = passwordService;
+        private readonly IServiceProvider _serviceProvider = serviceProvider;
 
         [ObservableProperty]
         private string _usuario = string.Empty;
@@ -37,23 +37,18 @@ namespace ClientesMixtos.ViewModels
             else
             {
                 MessageBox.Show("Bienvenido!");
-
-                var mainView = new MainView
-                {
-                    DataContext = _serviceProvider.GetRequiredService<MainViewModel>()
-                };
-
-                Application.Current.MainWindow = mainView;
-                mainView.Show();
-
-                Application.Current.Windows.OfType<PinView>().FirstOrDefault()?.Close();
+                OpenMainWindow();
             }
         }
 
-        public PinViewModel(PasswordService passwordService, IServiceProvider serviceProvider)
+        public void OpenMainWindow()
         {
-            _passwordService = passwordService;
-            _serviceProvider = serviceProvider;
+            var mainView = ActivatorUtilities.CreateInstance<MainWindow>(_serviceProvider);
+
+            Application.Current.MainWindow = mainView;
+            Application.Current.Windows.OfType<PinDialog>().FirstOrDefault()?.Close();
+            
+            mainView.Show();
         }
     }
 }

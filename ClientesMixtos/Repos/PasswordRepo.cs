@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ClientesMixtos.Repositories
+namespace ClientesMixtos.Repos
 {
-    public class PasswordRepository(MongoContext context)
+    public class PasswordRepo(MongoContext context)
     {
         private readonly IMongoCollection<Password> _passwordCollection = context.GetCollection<Password>("passwords");
 

@@ -1,19 +1,21 @@
-﻿
+﻿using ClientesMixtos.ViewModels;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
 
-namespace ClientesMixtos.Views
+namespace ClientesMixtos
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainView : Window
+    public partial class MainWindow : Window
     {
-        public MainView()
+        public MainWindow(MainViewModel vm)
         {
             InitializeComponent();
+
+            DataContext = vm;
         }
     }
 }

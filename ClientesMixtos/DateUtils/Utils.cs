@@ -20,38 +20,31 @@ namespace ClientesMixtos.DateUtils
             return success ? fechaPago : null;
         }
 
-        public static void CalculateFechaDePago(Cliente cliente)
+        public static DateTime ObtenerProximaFechaPago(DateTime fechaCompra)
         {
-            if (cliente.State.FechaDeCompra is null) return;
+            fechaCompra = fechaCompra.Date;
+            DateTime hoy = DateTime.Today;
 
-            DateTime fechaCompra = (DateTime)cliente.State.FechaDeCompra;
-            DateTime hoy = DateTime.Now.Date;
-            int diaPago = fechaCompra.Day;
+            // Si la compra aún no ocurre, el primer pago es un mes después.
+            if (fechaCompra > hoy)
+                return CrearFechaValida(fechaCompra.AddMonths(1), fechaCompra.Day);
 
-            int diasEnMesActual = DateTime.DaysInMonth(hoy.Year, hoy.Month);
-            int diaAjustado = Math.Min(diaPago, diasEnMesActual);
-            DateTime fechaPago = new(hoy.Year, hoy.Month, diaAjustado);
+            // Fecha de pago correspondiente al mes actual.
+            DateTime fechaPago = CrearFechaValida(hoy, fechaCompra.Day);
 
+            // Si ya pasó este mes, mover al siguiente.
             if (fechaPago < hoy)
-            {
-                cliente.State.FechaDePago = fechaPago.AddMonths(1);
-                cliente.FechaDePago = ((DateTime)cliente.State.FechaDePago).ToString("dd/MM/yyyy");
-                return;
-            }
+                fechaPago = CrearFechaValida(hoy.AddMonths(1), fechaCompra.Day);
 
-            if (fechaCompra >= hoy)
-            {
-                int added = fechaCompra.Month - hoy.Month;
-                added = added == 0 ? 1 : added + 1;
+            return fechaPago;
+        }
 
-                DateTime siguienteMes = hoy.AddMonths(added);
-                int diasEnSiguienteMes = DateTime.DaysInMonth(siguienteMes.Year, siguienteMes.Month);
-                int diaAjustadoSiguiente = Math.Min(diaPago, diasEnSiguienteMes);
-                fechaPago = new DateTime(siguienteMes.Year, siguienteMes.Month, diaAjustadoSiguiente);
-            }
+        public static DateTime CrearFechaValida(DateTime referencia, int diaDeseado)
+        {
+            int dia = Math.Min(diaDeseado,
+                DateTime.DaysInMonth(referencia.Year, referencia.Month));
 
-            cliente.State.FechaDePago = fechaPago;
-            cliente.FechaDePago = ((DateTime)cliente.State.FechaDePago).ToString("dd/MM/yyyy");
+            return new DateTime(referencia.Year, referencia.Month, dia);
         }
     }
 }

@@ -428,18 +428,34 @@
                                 <Setter Property="BorderBrush" Value="#2563EB"/>
                                 <Setter Property="BorderThickness" Value="2"/>
                             </Trigger>
+
                             <DataTrigger Binding="{Binding State.Pendiente}" Value="True">
                                 <Setter Property="Background" Value="{DynamicResource BrushDangerLight}"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding State.Pendiente}" Value="False">
                                 <Setter Property="Background" Value="{DynamicResource BrushWarningLight}"/>
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding State.PagoEsteMes}" Value="True">
-                                <Setter Property="Background" Value="{DynamicResource BrushSuccessLight}"/>
-                            </DataTrigger>
+                            
                             <DataTrigger Binding="{Binding State.AtrasoGrave}" Value="True">
                                 <Setter Property="Background" Value="{DynamicResource BrushOverdueDark}"/>
                             </DataTrigger>
+
+                            <DataTrigger Binding="{Binding State.PagoEsteMes}" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource BrushSuccessLight}"/>
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding Perdido}" Value="True">
+                                <Setter Property="Background" Value="#2563EB"/>
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding Recuperado}" Value="True">
+                                <Setter Property="Background" Value="#F59E0B"/>
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding Saldado}" Value="True">
+                                <Setter Property="Background" Value="#7F60FF"/>
+                            </DataTrigger>
+
                         </Style.Triggers>
                     </Style>
                     <Style TargetType="DataGridCell">
@@ -456,25 +472,6 @@
                         </Style.Triggers>
                     </Style>
                 </Style.Resources>
-            </Style>
-
-            <Style x:Key="FirstCellStyle" TargetType="DataGridCell">
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Padding" Value="16,8"/>
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                <Setter Property="Foreground" Value="{DynamicResource BrushTextSecondary}"/>
-                <Setter Property="FontSize" Value="14"/>
-                <Setter Property="Background" Value="Transparent"/>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Recuperado}" Value="True">
-                        <Setter Property="BorderBrush" Value="#2563EB"/>
-                        <Setter Property="BorderThickness" Value="12,0,0,0"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Perdido}" Value="True">
-                        <Setter Property="BorderBrush" Value="#F59E0B"/>
-                        <Setter Property="BorderThickness" Value="12,0,0,0"/>
-                    </DataTrigger>
-                </Style.Triggers>
             </Style>
 
             <!-- MODERN INT TEXT BOX -->

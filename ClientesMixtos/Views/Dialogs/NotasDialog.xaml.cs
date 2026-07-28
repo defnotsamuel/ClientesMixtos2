@@ -11,14 +11,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace ClientesMixtos.Views
+namespace ClientesMixtos.Views.Dialogs
 {
     /// <summary>
     /// Lógica de interacción para NotasView.xaml
     /// </summary>
-    public partial class NotasView : Window
+    public partial class NotasDialog : Window
     {
-        public NotasView(NotasViewModel vm)
+        public NotasDialog(NotasViewModel vm)
         {
             InitializeComponent();
 

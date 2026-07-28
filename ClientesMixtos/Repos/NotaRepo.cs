@@ -3,9 +3,9 @@ using ClientesMixtos.Models;
 using MongoDB.Driver;
 
 
-namespace ClientesMixtos.Repositories
+namespace ClientesMixtos.Repos
 {
-    public class NotaRepository(MongoContext context)
+    public class NotaRepo(MongoContext context)
     {
         private readonly IMongoCollection<Nota> _collection = context.GetCollection<Nota>("notas");
 

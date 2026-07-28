@@ -1,10 +1,10 @@
 using System.Windows;
 
-namespace ClientesMixtos.Views
+namespace ClientesMixtos.Views.Dialogs
 {
-    public partial class AddPagoView : Window
+    public partial class AddPagoDialog : Window
     {
-        public AddPagoView(ViewModels.AddPagoViewModel vm)
+        public AddPagoDialog(ViewModels.AddPagoViewModel vm)
         {
             InitializeComponent();
             DataContext = vm;

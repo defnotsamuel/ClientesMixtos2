@@ -1,11 +1,11 @@
 ﻿using ClientesMixtos.ViewModels;
 using System.Windows;
 
-namespace ClientesMixtos.Views
+namespace ClientesMixtos.Views.Dialogs
 {
-    public partial class NotaFormWindow : Window
+    public partial class NewNotaDialog : Window
     {
-        public NotaFormWindow(NotaFormViewModel vm)
+        public NewNotaDialog(NotaFormViewModel vm)
         {
             InitializeComponent();
             DataContext = vm;

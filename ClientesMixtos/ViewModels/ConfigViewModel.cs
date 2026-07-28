@@ -3,6 +3,7 @@ using ClientesMixtos.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
+using ClientesMixtos.Views.Dialogs;
 
 namespace ClientesMixtos.ViewModels
 {
@@ -30,7 +31,7 @@ namespace ClientesMixtos.ViewModels
         [RelayCommand]
         public void ConfigurePIN()
         {
-            var newPinView = new Views.NewPinView();
+            var newPinView = new NewPinDialog();
             var model = new NewPinViewModel(_passwordService);
 
             newPinView.DataContext = model;

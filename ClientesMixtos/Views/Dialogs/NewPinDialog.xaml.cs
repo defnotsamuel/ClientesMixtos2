@@ -10,14 +10,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace ClientesMixtos.Views
+namespace ClientesMixtos.Views.Dialogs
 {
     /// <summary>
     /// Lógica de interacción para PinView.xaml
     /// </summary>
-    public partial class PinView : Window
+    public partial class NewPinDialog : Window
     {
-        public PinView()
+        public NewPinDialog()
         {
             InitializeComponent();
         }

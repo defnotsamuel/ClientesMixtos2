@@ -1,14 +1,17 @@
 using ClientesMixtos.ViewModels;
 using System.Windows;
 
-namespace ClientesMixtos.Views
+namespace ClientesMixtos.Views.Dialogs
 {
-    public partial class PagosView : Window
+    public partial class PagosDialog : Window
     {
-        public PagosView(PagosViewModel vm)
+        public PagosViewModel vm;
+        public PagosDialog(PagosViewModel vm)
         {
             InitializeComponent();
+
             DataContext = vm;
+            this.vm = vm;
         }
 
         private void Cerrar_Click(object sender, RoutedEventArgs e)

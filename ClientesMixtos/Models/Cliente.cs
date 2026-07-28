@@ -57,6 +57,9 @@ namespace ClientesMixtos.Models
         [BsonElement("PERDIDO")]
         public bool Perdido { get; set; }
 
+        [BsonElement("SALDADO")]
+        public bool Saldado { get; set; }
+
         [BsonElement("ULTIMA FECHA PAGADA")]
         public string UltimaFechaPagada { get; set; } = string.Empty;
 

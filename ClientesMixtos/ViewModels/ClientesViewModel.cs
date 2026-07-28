@@ -1,9 +1,10 @@
 ﻿using ClientesMixtos.Models;
-using ClientesMixtos.Repositories;
+using ClientesMixtos.Repos;
 using ClientesMixtos.Services;
-using ClientesMixtos.Views;
+using ClientesMixtos.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,12 +20,11 @@ namespace ClientesMixtos.ViewModels
     {
         private readonly ClienteService _clienteService;
         private readonly NotaService _notaService;
-        private readonly PagosClienteRepository _pagosRepo;
-        private readonly ClienteRepository _clienteRepo;
+        private readonly PagoService _pagoService;
 
         public ObservableCollection<Cliente> _clientes;
         public ObservableCollection<string> Lotes { get; } = [];
-        public ICollectionView CClientesView { get; }
+        public ICollectionView CClientesView { get; set; }
 
         [ObservableProperty]
         private string _loteSeleccionado = "Todos";
@@ -49,7 +49,7 @@ namespace ClientesMixtos.ViewModels
             lotes.Remove("Todos");
 
             var model = new NewLoteViewModel(lotes);
-            var newLoteView = new NewLoteView(model);
+            var newLoteView = new NewLoteDialog(model);
             if (newLoteView.ShowDialog() ?? false)
             {
                 Lotes.Add(model.Lote);
@@ -64,7 +64,7 @@ namespace ClientesMixtos.ViewModels
             lotes.Remove("Todos");
 
             var model = new AddClienteViewModel(lotes);
-            var addView = new AddClienteView(model);
+            var addView = new AddClienteDialog(model);
 
             if (addView.ShowDialog() ?? false)
             {
@@ -102,10 +102,24 @@ namespace ClientesMixtos.ViewModels
             }
 
             var dialogVm = new MarcarDialogViewModel();
-            var dialog = new MarcarDialogView(dialogVm);
+            var dialog = new MarcarDialog(dialogVm);
             if (dialog.ShowDialog() != true) return;
 
             await _clienteService.MarcarCliente(cliente, dialogVm.Meses);
+            CClientesView.Refresh();
+        }
+
+        [RelayCommand]
+        public async Task MarkAsPaid(Cliente cliente)
+        {
+            if (MessageBoxResult.Yes != MessageBox.Show($"¿Está seguro de saldar al cliente {cliente.Nombre}?", "Confirmar", MessageBoxButton.YesNo, MessageBoxImage.Warning))
+            {
+                return;
+            }
+
+            cliente.Saldado = true;
+
+            await _clienteService.UpdateCliente(cliente);
             CClientesView.Refresh();
         }
 
@@ -116,7 +130,7 @@ namespace ClientesMixtos.ViewModels
             lotes.Remove("Todos");
 
             var model = new EditViewModel(cliente, lotes);
-            var editView = new EditView(model);
+            var editView = new EditClienteDialog(model);
 
             if (editView.ShowDialog() ?? false)
                 await _clienteService.UpdateCliente(cliente);
@@ -129,7 +143,7 @@ namespace ClientesMixtos.ViewModels
         {
             var vm = new NotasViewModel(cliente, _notaService);
             await vm.LoadDataAsync();
-            var notasView = new NotasView(vm);
+            var notasView = new NotasDialog(vm);
 
             notasView.ShowDialog();
         }
@@ -137,21 +151,20 @@ namespace ClientesMixtos.ViewModels
         [RelayCommand]
         public async Task Pagos(Cliente cliente)
         {
-            var vm = new PagosViewModel(cliente, _pagosRepo, _clienteRepo);
+            var vm = new PagosViewModel(cliente, _pagoService, _clienteService);
             await vm.LoadDataAsync();
-            var pagosView = new PagosView(vm);
 
+            var pagosView = new PagosDialog(vm);
             pagosView.ShowDialog();
 
             await RealoadDataAsync();
         }
 
-        public ClientesViewModel(ClienteService clienteService, NotaService notaService, PagosClienteRepository pagosRepo, ClienteRepository clienteRepo)
+        public ClientesViewModel(ClienteService clienteService, NotaService notaService, PagoService pagoService)
         {
             _clienteService = clienteService;
             _notaService = notaService;
-            _pagosRepo = pagosRepo;
-            _clienteRepo = clienteRepo;
+            _pagoService = pagoService;
 
             _clientes = [];
             CClientesView = CollectionViewSource.GetDefaultView(_clientes);
@@ -165,11 +178,8 @@ namespace ClientesMixtos.ViewModels
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    _clientes.Clear();
-                    foreach (var c in clientes)
-                        _clientes.Add(c);
+                    _clientes = new(clientes);
 
-                    Console.WriteLine(CClientesView.IsEmpty);
                     CClientesView.Refresh();
                     OnPropertyChanged(nameof(Lotes));
                 });
@@ -192,12 +202,13 @@ namespace ClientesMixtos.ViewModels
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    _clientes.Clear();
-                    foreach (var c in clientes) 
-                        _clientes.Add(c);
+                    _clientes = new(clientes);
+                    CClientesView = CollectionViewSource.GetDefaultView(clientes);
+
 
                     Lotes.Clear();
                     Lotes.Add("Todos");
+
                     foreach (var c in clientes)
                     {
                         string lote = c.Lote;
@@ -205,10 +216,8 @@ namespace ClientesMixtos.ViewModels
                             Lotes.Add(lote);
                     }
 
-                    Console.WriteLine(CClientesView.IsEmpty);
-                    CClientesView.Refresh();
                     OnPropertyChanged(nameof(Lotes));
-
+                    OnPropertyChanged(nameof(CClientesView));
                 });
             }
             catch

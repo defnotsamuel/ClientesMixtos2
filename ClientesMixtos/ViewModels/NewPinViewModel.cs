@@ -1,10 +1,7 @@
 ﻿using ClientesMixtos.Services;
-using ClientesMixtos.Views;
+using ClientesMixtos.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -26,7 +23,7 @@ namespace ClientesMixtos.ViewModels
             if (await _passwordService.SavePassword(pinValue ?? "", Usuario))
             {
                 MessageBox.Show("PIN guardado correctamente!");
-                Application.Current.Windows.OfType<NewPinView>().FirstOrDefault()?.Close();
+                Application.Current.Windows.OfType<NewPinDialog>().FirstOrDefault()?.Close();
 
             }
             else

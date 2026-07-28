@@ -8,10 +8,14 @@ namespace ClientesMixtos.Models
 {
     public class Pago
     {
-        [BsonGuidRepresentation(GuidRepresentation.Standard)]
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public DateTime FechaPagada { get; set; }
-        public DateTime FechaMarcado { get; set; }
+        [BsonId]
+        public ObjectId Id { get; set; }
 
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string ClienteId { get; set; } = null!;
+
+        public DateTime FechaPagada { get; set; }
+
+        public DateTime? FechaMarcado { get; set; }
     }
 }

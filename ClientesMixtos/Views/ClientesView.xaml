@@ -52,8 +52,7 @@
                       Style="{StaticResource ModernDataGrid}">
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Lote" Width="60" Binding="{Binding Lote}"
-                        CellStyle="{StaticResource FirstCellStyle}"/>
+                    <DataGridTextColumn Header="Lote" Width="60" Binding="{Binding Lote}"/>
                     <DataGridTextColumn Header="Libro 1" Width="60" Binding="{Binding Libro1}" />
                     <DataGridTextColumn Header="Libro 2" Width="60" Binding="{Binding Libro2}" />
                     <DataGridTextColumn Header="Nombre" Width="60" Binding="{Binding Nombre}" />
@@ -153,6 +152,22 @@
                                 <Style.Triggers>
                                     <Trigger Property="IsEnabled" Value="True">
                                         <Setter Property="Background" Value="#10B981"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Content="Saldar" Width="80" Height="32" Margin="4,0"
+                            Command="{Binding MarkAsPaidCommand}"
+                            CommandParameter="{Binding ClienteSeleccionado}"
+                            IsEnabled="{Binding HasSelectedClient}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                                <Setter Property="Background" Value="#9CA3AF"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="True">
+                                        <Setter Property="Background" Value="#102981"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>

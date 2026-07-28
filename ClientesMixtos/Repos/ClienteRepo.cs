@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ClientesMixtos.Repositories
+namespace ClientesMixtos.Repos
 {
-    public class ClienteRepository(MongoContext context)
+    public class ClienteRepo(MongoContext context)
     {
         private readonly IMongoCollection<Cliente> _collection = context.GetCollection<Cliente>("clientes");
 
@@ -59,7 +59,8 @@ namespace ClientesMixtos.Repositories
                 .Set(c => c.FechaVence, cliente.FechaVence)
                 .Set(c => c.Recuperado, cliente.Recuperado)
                 .Set(c => c.Perdido, cliente.Perdido)
-                .Set(c => c.Refrenda, cliente.Refrenda);
+                .Set(c => c.Refrenda, cliente.Refrenda)
+                .Set(c => c.Saldado, cliente.Saldado);
 
             return _collection.UpdateOneAsync(filter, update);
         }
