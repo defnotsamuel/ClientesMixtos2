@@ -72,5 +72,38 @@ namespace ClientesMixtos.Services
         {
             return _repository.Delete(id);
         }
+
+        public async Task CrearPagoDesdeFechaMarcada(Cliente cliente)
+        {
+            if (cliente.State.FechaDeCompra is null ||
+                cliente.State.FechaMarcada is null)
+                return;
+
+            DateTime fechaCompra = cliente.State.FechaDeCompra.Value.Date;
+            DateTime fechaMarcada = cliente.State.FechaMarcada.Value.Date;
+
+            int diaPago = Math.Min(
+                fechaCompra.Day,
+                DateTime.DaysInMonth(fechaMarcada.Year, fechaMarcada.Month));
+
+            DateTime fechaPagada = new(
+                fechaMarcada.Year,
+                fechaMarcada.Month,
+                diaPago);
+
+            var existente = await _repository.GetByFecha(
+                cliente.ClienteId,
+                fechaPagada);
+
+            if (existente is not null)
+                return;
+
+            await _repository.Insert(new Pago
+            {
+                ClienteId = cliente.ClienteId,
+                FechaPagada = fechaPagada,
+                FechaMarcado = fechaMarcada
+            });
+        }
     }
 }

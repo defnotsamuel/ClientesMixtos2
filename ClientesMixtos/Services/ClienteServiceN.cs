@@ -25,6 +25,7 @@ namespace ClientesMixtos.Services
             {
                 CargarFechas(cliente);
 
+                await pagoService.CrearPagoDesdeFechaMarcada(cliente);
                 await CalculateFechaDePago(cliente);
                 await CargarEstados(cliente);
             }
