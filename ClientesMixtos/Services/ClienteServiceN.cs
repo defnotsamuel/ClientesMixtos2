@@ -26,7 +26,7 @@ namespace ClientesMixtos.Services
                 CargarFechas(cliente);
 
                 await pagoService.CrearPagoDesdeFechaMarcada(cliente);
-                await CalculateFechaDePago(cliente);
+                await CalculateFechaDePago(cliente, updatePago: true);
                 await CargarEstados(cliente);
             }
 
@@ -123,7 +123,7 @@ namespace ClientesMixtos.Services
             cliente.State.FechaVence = Utils.ParseDate(cliente.FechaVence);
         }
 
-        public async Task CalculateFechaDePago(Cliente cliente, bool force = false)
+        public async Task CalculateFechaDePago(Cliente cliente, bool force = false, bool updatePago = false)
         {
             if (cliente.State.FechaDeCompra is null)
                 return;
@@ -159,6 +159,9 @@ namespace ClientesMixtos.Services
 
             cliente.State.FechaDePago = fechaPago;
             cliente.FechaDePago = fechaPago.ToString("dd/MM/yyyy");
+
+            if (updatePago)
+                await clienteRepository.UpdateFechaPago(cliente);
         }
 
         private static int CalcularMesesAtrasado(
