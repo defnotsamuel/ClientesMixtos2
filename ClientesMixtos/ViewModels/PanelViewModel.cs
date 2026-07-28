@@ -21,7 +21,7 @@ namespace ClientesMixtos.ViewModels
     {
 
         private readonly ClienteService _clienteService;
-        private ObservableCollection<Cliente> _pendingClientes;
+        private ObservableCollection<Cliente> _pendingClientes = [];
 
         [ObservableProperty]
         private int _totalClientes;
@@ -85,7 +85,6 @@ namespace ClientesMixtos.ViewModels
         {
             _clienteService = service;
 
-            _pendingClientes = [];
             PendingClientesView = CollectionViewSource.GetDefaultView(_pendingClientes);
         }
 
@@ -97,10 +96,10 @@ namespace ClientesMixtos.ViewModels
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    _pendingClientes = new ObservableCollection<Cliente>(FilterClientsByCurrentMonth(clientes));
 
-                    PendingClientesView = CollectionViewSource.GetDefaultView(_pendingClientes);
-                    OnPropertyChanged(nameof(PendingClientesView));
+                    var clientesPendientes = FilterClientsByCurrentMonth(clientes);
+                    foreach (var cliente in clientesPendientes)
+                        _pendingClientes.Add(cliente);
 
                     TotalClientes = clientes.Count;
                     TotalPendingClientes = _pendingClientes.Count(c => !c.State.MarcadoEsteMes);

@@ -22,7 +22,8 @@ namespace ClientesMixtos.ViewModels
         private readonly NotaService _notaService;
         private readonly PagoService _pagoService;
 
-        public ObservableCollection<Cliente> _clientes = [];
+        private readonly ObservableCollection<Cliente> _clientes = [];
+
         public ObservableCollection<string> Lotes { get; } = [];
         public ICollectionView CClientesView { get; set; }
 
