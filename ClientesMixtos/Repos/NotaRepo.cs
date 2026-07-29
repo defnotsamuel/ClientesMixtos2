@@ -1,20 +1,22 @@
 ﻿using ClientesMixtos.DB;
 using ClientesMixtos.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
-
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ClientesMixtos.Repos
 {
-    public class NotaRepo(MongoContext context)
+    public class NotaRepo : INotaRepo
     {
-        private readonly IMongoCollection<Nota> _collection = context.GetCollection<Nota>("notas");
+        private readonly IMongoCollection<Nota> _collection;
 
-        public Task<List<Nota>> GetAll()
+        public NotaRepo(IMongoContext context)
         {
-            return _collection.Find(_ => true).ToListAsync();
+            _collection = context.GetCollection<Nota>("notas");
         }
 
-        public Task<List<Nota>> GetByClienteId(string clienteId)
+        public Task<List<Nota>> GetByClienteId(ObjectId clienteId)
         {
             var filtro = Builders<Nota>.Filter.Eq(n => n.ClienteId, clienteId);
             return _collection.Find(filtro).ToListAsync();
@@ -37,7 +39,7 @@ namespace ClientesMixtos.Repos
             return _collection.DeleteOneAsync(filtro);
         }
 
-        public Task DeleteByClienteId(string clienteId)
+        public Task DeleteByClienteId(ObjectId clienteId)
         {
             var filtro = Builders<Nota>.Filter.Eq(n => n.ClienteId, clienteId);
             return _collection.DeleteManyAsync(filtro);

@@ -1,5 +1,4 @@
 using ClientesMixtos.Models;
-using ClientesMixtos.Repos;
 using ClientesMixtos.Services;
 using ClientesMixtos.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,18 +10,24 @@ using System.Windows;
 
 namespace ClientesMixtos.ViewModels
 {
-    public partial class PagosViewModel(Cliente cliente, PagoService pagoService, ClienteService clienteService) : ObservableObject
+    public partial class PagosViewModel : ObservableObject
     {
-        private readonly Cliente _cliente = cliente;
-        private readonly PagoService pagoService = pagoService;
-        private readonly ClienteService clienteService = clienteService;
+        private readonly Cliente _cliente;
+        private readonly IPagoService _pagoService;
+        private readonly IClienteService _clienteService;
 
         public ObservableCollection<Pago> ListaPagos { get; } = [];
-
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(EliminarCommand))]
         private Pago? _pagoSeleccionado;
+
+        public PagosViewModel(Cliente cliente, IPagoService pagoService, IClienteService clienteService)
+        {
+            _cliente = cliente;
+            _pagoService = pagoService;
+            _clienteService = clienteService;
+        }
 
         [RelayCommand(CanExecute = nameof(HayPagoSeleccionado))]
         private async Task Eliminar()
@@ -39,7 +44,7 @@ namespace ClientesMixtos.ViewModels
             if (confirmacion != MessageBoxResult.Yes)
                 return;
 
-            await pagoService.EliminarPago(PagoSeleccionado.Id);
+            await _pagoService.EliminarPago(PagoSeleccionado.Id);
 
             ListaPagos.Remove(PagoSeleccionado);
 
@@ -64,15 +69,14 @@ namespace ClientesMixtos.ViewModels
                 _cliente.State.FechaDePago = null;
                 _cliente.State.FechaMarcada = null;
 
-                await clienteService.CalculateFechaDePago(_cliente);
+                await _clienteService.CalculateFechaDePago(_cliente);
             }
 
             _cliente.FechaMarcada = _cliente.State.FechaMarcada.HasValue ?
                 _cliente.State.FechaMarcada.Value.ToString("dd/MM/yyyy") : "";
 
-            await clienteService.UpdateCliente(_cliente);
+            await _clienteService.UpdateCliente(_cliente);
         }
-
 
         [RelayCommand]
         private async Task AgregarPago()
@@ -83,7 +87,7 @@ namespace ClientesMixtos.ViewModels
             if (dialog.ShowDialog() != true)
                 return;
 
-            var pago = await pagoService.RegistrarPago(
+            var pago = await _pagoService.RegistrarPago(
                 _cliente.ClienteId,
                 vm.FechaSeleccionada, DateTime.Now.Date);
 
@@ -93,7 +97,7 @@ namespace ClientesMixtos.ViewModels
 
         public async Task LoadDataAsync()
         {
-            var pagosCliente = await pagoService.GetHistorial(_cliente.ClienteId);
+            var pagosCliente = await _pagoService.GetHistorial(_cliente.ClienteId);
 
             await Application.Current.Dispatcher.InvokeAsync(() =>
             {
@@ -106,7 +110,6 @@ namespace ClientesMixtos.ViewModels
                 }
             });
         }
-
 
         private bool HayPagoSeleccionado() => PagoSeleccionado != null;
     }

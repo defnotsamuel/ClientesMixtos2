@@ -1,15 +1,19 @@
 ﻿using ClientesMixtos.DB;
 using ClientesMixtos.Models;
 using MongoDB.Driver;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ClientesMixtos.Repos
 {
-    public class PasswordRepo(MongoContext context)
+    public class PasswordRepo : IPasswordRepo
     {
-        private readonly IMongoCollection<Password> _passwordCollection = context.GetCollection<Password>("passwords");
+        private readonly IMongoCollection<Password> _passwordCollection;
+
+        public PasswordRepo(IMongoContext context)
+        {
+            _passwordCollection = context.GetCollection<Password>("passwords");
+        }
 
         public Task InsertPassword(Password password)
         {

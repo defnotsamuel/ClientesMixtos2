@@ -4,23 +4,21 @@ using System;
 
 namespace ClientesMixtos.ViewModels
 {
-    public partial class AddPagoViewModel : ObservableObject
+    public partial class AddPagoViewModel : DialogViewModelBase
     {
         [ObservableProperty]
         private DateTime _fechaSeleccionada = DateTime.Today;
 
-        public event Action<bool?>? CloseRequested;
-
         [RelayCommand]
         public void Aceptar()
         {
-            CloseRequested?.Invoke(true);
+            RequestClose(true);
         }
 
         [RelayCommand]
         public void Cancelar()
         {
-            CloseRequested?.Invoke(false);
+            RequestClose(false);
         }
     }
 }

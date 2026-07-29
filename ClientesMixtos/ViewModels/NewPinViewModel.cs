@@ -1,5 +1,4 @@
 ﻿using ClientesMixtos.Services;
-using ClientesMixtos.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
@@ -7,12 +6,17 @@ using System.Windows.Controls;
 
 namespace ClientesMixtos.ViewModels
 {
-    public partial class NewPinViewModel(PasswordService passwordService) : ObservableObject
+    public partial class NewPinViewModel : DialogViewModelBase
     {
-        private readonly PasswordService _passwordService = passwordService;
+        private readonly IPasswordService _passwordService;
 
         [ObservableProperty]
         private string _usuario = string.Empty;
+
+        public NewPinViewModel(IPasswordService passwordService)
+        {
+            _passwordService = passwordService;
+        }
 
         [RelayCommand]
         public async Task AddPin(object? pin)
@@ -23,8 +27,7 @@ namespace ClientesMixtos.ViewModels
             if (await _passwordService.SavePassword(pinValue ?? "", Usuario))
             {
                 MessageBox.Show("PIN guardado correctamente!");
-                Application.Current.Windows.OfType<NewPinDialog>().FirstOrDefault()?.Close();
-
+                RequestClose(true);
             }
             else
             {

@@ -3,7 +3,6 @@ using ClientesMixtos.Services;
 using ClientesMixtos.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,21 +12,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Input;
 
 namespace ClientesMixtos.ViewModels
 {
-    public partial class PanelViewModel: ObservableObject
+    public partial class PanelViewModel : ObservableObject
     {
-
-        private readonly ClienteService _clienteService;
+        private readonly IClienteService _clienteService;
         private ObservableCollection<Cliente> _pendingClientes = [];
 
         [ObservableProperty]
         private int _totalClientes;
 
         [ObservableProperty]
-        private int _totalPendingClientes;
+        private int _pendingClientesCount;
 
         [ObservableProperty]
         private int _totalPerdidos;
@@ -36,10 +33,10 @@ namespace ClientesMixtos.ViewModels
         private int _totalRecuperados;
 
         [ObservableProperty]
-        private string _textoBusqueda = string.Empty;
+        private string _searchText = string.Empty;
 
-        public static string CurrentMonth 
-        { 
+        public static string CurrentMonth
+        {
             get
             {
                 var cultura = new CultureInfo("es-SV");
@@ -50,6 +47,14 @@ namespace ClientesMixtos.ViewModels
         }
 
         public ICollectionView PendingClientesView { get; set; }
+
+        public PanelViewModel(IClienteService service)
+        {
+            _clienteService = service;
+            PendingClientesView = CollectionViewSource.GetDefaultView(_pendingClientes);
+
+            _ = LoadDataAsync();
+        }
 
         [RelayCommand]
         public async Task Mark(Cliente cliente)
@@ -67,26 +72,19 @@ namespace ClientesMixtos.ViewModels
             await _clienteService.MarcarCliente(cliente, dialogVm.Meses);
 
             PendingClientesView.Refresh();
-            TotalPendingClientes--;
+            PendingClientesCount--;
         }
 
-        partial void OnTextoBusquedaChanged(string value) => PendingClientesView.Filter = (obj) =>
+        partial void OnSearchTextChanged(string value) => PendingClientesView.Filter = (obj) =>
         {
             if (obj is Cliente cliente)
             {
-                return string.IsNullOrEmpty(TextoBusqueda) ||
-                       cliente.Nombre.Contains(TextoBusqueda, StringComparison.OrdinalIgnoreCase) ||
-                       cliente.Vehiculo.Contains(TextoBusqueda, StringComparison.OrdinalIgnoreCase);
+                return string.IsNullOrEmpty(SearchText) ||
+                       cliente.Nombre.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                       cliente.Vehiculo.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
             }
             return false;
         };
-
-        public PanelViewModel(ClienteService service)
-        {
-            _clienteService = service;
-
-            PendingClientesView = CollectionViewSource.GetDefaultView(_pendingClientes);
-        }
 
         public async Task LoadDataAsync()
         {
@@ -96,20 +94,18 @@ namespace ClientesMixtos.ViewModels
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-
                     var clientesPendientes = FilterClientsByCurrentMonth(clientes);
                     foreach (var cliente in clientesPendientes)
                         _pendingClientes.Add(cliente);
 
                     TotalClientes = clientes.Count;
-                    TotalPendingClientes = _pendingClientes.Count(c => !c.State.MarcadoEsteMes);
+                    PendingClientesCount = _pendingClientes.Count(c => !c.State.MarcadoEsteMes);
                     TotalPerdidos = clientes.Count(c => c.Perdido);
                     TotalRecuperados = clientes.Count(c => c.Recuperado);
                 });
             }
             catch
             {
-                // BD desconectada — los datos se cargarán al reconectar
             }
         }
 
@@ -120,6 +116,5 @@ namespace ClientesMixtos.ViewModels
             return [.. clientes.Where(c => (c.State.FechaDePago?.Month == current.Month
                     && c.State.FechaDePago?.Year == current.Year) || c.State.MarcadoEsteMes)];
         }
-
     }
 }

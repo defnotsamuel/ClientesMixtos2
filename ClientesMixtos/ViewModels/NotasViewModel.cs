@@ -8,10 +8,10 @@ using System.Windows;
 
 namespace ClientesMixtos.ViewModels
 {
-    public partial class NotasViewModel(Cliente cliente, NotaService notaService) : ObservableObject
+    public partial class NotasViewModel : ObservableObject
     {
-        private readonly Cliente _cliente = cliente;
-        private readonly NotaService _notaService = notaService;
+        private readonly Cliente _cliente;
+        private readonly INotaService _notaService;
 
         public ObservableCollection<Nota> ListaNotas { get; } = [];
 
@@ -19,6 +19,12 @@ namespace ClientesMixtos.ViewModels
         [NotifyCanExecuteChangedFor(nameof(EliminarCommand))]
         [NotifyCanExecuteChangedFor(nameof(EditarCommand))]
         private Nota? _notaSeleccionada;
+
+        public NotasViewModel(Cliente cliente, INotaService notaService)
+        {
+            _cliente = cliente;
+            _notaService = notaService;
+        }
 
         public async Task LoadDataAsync()
         {
@@ -34,7 +40,7 @@ namespace ClientesMixtos.ViewModels
         private async Task Crear()
         {
             var vm = new NotaFormViewModel();
-            var ventana = new NewNotaDialog(vm) { Title = "NUEVA NOTA"};
+            var ventana = new NewNotaDialog(vm) { Title = "NUEVA NOTA" };
 
             if (ventana.ShowDialog() == true && vm.NotaResultado is not null)
             {

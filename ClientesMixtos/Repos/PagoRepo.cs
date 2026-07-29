@@ -4,15 +4,20 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace ClientesMixtos.Repos
 {
-    public class PagoRepo(MongoContext context)
+    public class PagoRepo : IPagoRepo
     {
-        private readonly IMongoCollection<Pago> _collection = context.Database.GetCollection<Pago>("Pagos");
+        private readonly IMongoCollection<Pago> _collection;
 
-        public async Task<List<Pago>> GetByClienteId(string clienteId)
+        public PagoRepo(IMongoContext context)
+        {
+            _collection = context.Database.GetCollection<Pago>("Pagos");
+        }
+
+        public async Task<List<Pago>> GetByClienteId(ObjectId clienteId)
         {
             return await _collection
                 .Find(x => x.ClienteId == clienteId)
@@ -20,14 +25,16 @@ namespace ClientesMixtos.Repos
                 .ToListAsync();
         }
 
-        public async Task<Pago?> GetByFecha(string clienteId, DateTime fechaPagada)
+        public async Task<Pago?> GetByFecha(ObjectId clienteId, DateTime fechaPagada)
         {
-            return await _collection
-                .Find(x =>
-                    x.ClienteId == clienteId &&
-                    x.FechaPagada.Year == fechaPagada.Year &&
-                    x.FechaPagada.Month == fechaPagada.Month)
-                .FirstOrDefaultAsync();
+            var inicio = new DateTime(fechaPagada.Year, fechaPagada.Month, 1);
+            var fin = inicio.AddMonths(1);
+
+            return await _collection.Find(x =>
+                (x.ClienteId) == clienteId &&
+                x.FechaPagada >= inicio &&
+                x.FechaPagada < fin)
+            .FirstOrDefaultAsync();
         }
 
         public async Task Insert(Pago pago)

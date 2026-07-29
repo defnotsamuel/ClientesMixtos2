@@ -7,43 +7,38 @@ using ClientesMixtos.Views.Dialogs;
 
 namespace ClientesMixtos.ViewModels
 {
-    public partial class ConfigViewModel(Services.PasswordService service) : ObservableObject
+    public partial class ConfigViewModel : ObservableObject
     {
-        private readonly Services.PasswordService _passwordService = service;
+        private readonly GlobalConfig _config;
+        private readonly UIFactory _uiFactory;
 
         [ObservableProperty]
-        private string _connectionString = GlobalConfig.ConnectionString();
+        private string _connectionString;
 
         [ObservableProperty]
-        private string _databaseName = GlobalConfig.DatabaseName();
+        private string _databaseName;
 
-        [ObservableProperty]
-        private bool _isDarkMode = GlobalConfig.Theme() == "Dark";
-
-        partial void OnIsDarkModeChanged(bool value)
+        public ConfigViewModel(GlobalConfig config, UIFactory uiFactory)
         {
-            var theme = value ? "Dark" : "Light";
-            GlobalConfig.SetTheme(theme);
-            GlobalConfig.SaveConfig();
-            ThemeManager.Apply(theme);
+            _config = config;
+            _uiFactory = uiFactory;
+            _connectionString = config.ConnectionString;
+            _databaseName = config.DatabaseName;
         }
 
         [RelayCommand]
         public void ConfigurePIN()
         {
-            var newPinView = new NewPinDialog();
-            var model = new NewPinViewModel(_passwordService);
-
-            newPinView.DataContext = model;
+            var newPinView = _uiFactory.Create<NewPinDialog>();
             newPinView.ShowDialog();
         }
 
         [RelayCommand]
         public void SaveConfig()
         {
-            GlobalConfig.SetConnectionString(ConnectionString);
-            GlobalConfig.SetDatabaseName(DatabaseName);
-            GlobalConfig.SaveConfig();
+            _config.SetConnectionString(ConnectionString);
+            _config.SetDatabaseName(DatabaseName);
+            _config.Save();
 
             MessageBox.Show(
                 "Configuración guardada. Reinicia la aplicación para aplicar los cambios.",

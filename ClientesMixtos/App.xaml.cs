@@ -1,6 +1,12 @@
-﻿using ClientesMixtos.DB;
+﻿using ClientesMixtos.Configuration;
+using ClientesMixtos.DB;
+using ClientesMixtos.DateUtils;
+using ClientesMixtos.Repos;
+using ClientesMixtos.Services;
 using ClientesMixtos.Views.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 using System.IO;
 using System.Windows;
 
@@ -9,16 +15,27 @@ namespace ClientesMixtos
     public partial class App : Application
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly IHost _host;
 
-        public App ()
+        public App()
         {
-
             Dispatcher.UnhandledException += OnUnhandledException;
 
-            var services = new ServiceCollection();
-            ConfigureServices(services);
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.Console()
+                .WriteTo.File(Path.Combine(AppContext.BaseDirectory, "Logs/logs-.txt"),
+                            rollingInterval: RollingInterval.Day,
+                            fileSizeLimitBytes: 1_000_000,
+                            rollOnFileSizeLimit: true)
+                .CreateLogger();
 
-            _serviceProvider = services.BuildServiceProvider();
+            _host = Host.CreateDefaultBuilder()
+                .UseSerilog()
+                .ConfigureServices(ConfigureServices)
+                .Build();
+
+            _serviceProvider = _host.Services;
         }
 
         private void OnUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
@@ -31,8 +48,9 @@ namespace ClientesMixtos
         {
             var crashLogPath = Path.Combine(AppContext.BaseDirectory, "crash.log");
 
-            MessageBox.Show($"Ha ocurrido un error: {e.Message}. Mira crash.log para mas detalles");
+            Log.Fatal($"{e.Source}: {e.Message} - {e.StackTrace}");
 
+            MessageBox.Show($"Ha ocurrido un error: {e.Message}. Mira crash.log para mas detalles");
             File.WriteAllText(crashLogPath, $"{e.Message}:{e.StackTrace}");
         }
 
@@ -40,50 +58,69 @@ namespace ClientesMixtos
         {
             base.OnStartup(e);
 
-            Services.ThemeManager.Apply(Configuration.GlobalConfig.Theme());
+            Log.Information("Iniciando host nativo");
 
-            var passwordRepo = _serviceProvider.GetRequiredService<Repos.PasswordRepo>();
-            try
+            await _host.StartAsync();
+
+            Log.Information("Host nativo iniciado");
+
+            var uiFactory = _serviceProvider.GetRequiredService<UIFactory>();
+            var passwordService = _serviceProvider.GetRequiredService<IPasswordService>();
+
+            var mainWindow = uiFactory.Create<MainWindow>();
+            if (await passwordService.HasUsers())
             {
-                var passwords = await passwordRepo.GetAll();
-
-                if (passwords.Count > 0)
+                var passwordWindow = uiFactory.Create<PinDialog>();
+                if (passwordWindow.ShowDialog() == true)
                 {
-                    var passwordWindow = ActivatorUtilities.CreateInstance<PinDialog>(_serviceProvider);
-
-                    passwordWindow.Show();
-                    return;
+                    mainWindow.Show();
                 }
             }
-            catch
-            {
-            }
+            else
+                mainWindow.Show();
+        }
 
-            var mainWindow = ActivatorUtilities.CreateInstance<MainWindow>(_serviceProvider);
-            mainWindow.Show();
+        protected override async void OnExit(ExitEventArgs e)
+        {
+            Log.Information("Deteniendo host nativo");
+
+            await _host.StopAsync();
+            _host.Dispose();
+
+            Log.Information("Host nativo detenido");
+
+            base.OnExit(e);
         }
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<MongoContext>();
+            Log.Information("Configurando servicios de la aplicacion");
 
-            services.AddSingleton<Repos.ClienteRepo>();
-            services.AddSingleton<Repos.NotaRepo>();
-            services.AddSingleton<Repos.PasswordRepo>();
-            services.AddSingleton<Repos.PagoRepo>();
+            services.AddSingleton<GlobalConfig>();
+            services.AddSingleton<IMongoContext, MongoContext>();
+            services.AddSingleton<IDateUtils, DateUtils.Utils>();
+            services.AddSingleton<UIFactory>();
 
-            services.AddSingleton<Services.ClienteService>();
-            services.AddSingleton<Services.NotaService>();
-            services.AddSingleton<Services.PasswordService>();
-            services.AddSingleton<Services.PagoService>();
+            services.AddSingleton<IClienteRepo, ClienteRepo>();
+            services.AddSingleton<INotaRepo, NotaRepo>();
+            services.AddSingleton<IPasswordRepo, PasswordRepo>();
+            services.AddSingleton<IPagoRepo, PagoRepo>();
 
-            services.AddTransient<ViewModels.MainViewModel>();
-            services.AddTransient<ViewModels.PanelViewModel>();
-            services.AddTransient<ViewModels.ClientesViewModel>();
-            services.AddTransient<ViewModels.ConfigViewModel>();
+            services.AddSingleton<IClienteService, ClienteService>();
+            services.AddSingleton<INotaService, NotaService>();
+            services.AddSingleton<IPasswordService, PasswordService>();
+            services.AddSingleton<IPagoService, PagoService>();
+
+            services.AddSingleton<ViewModels.MainViewModel>();
+
+            services.AddSingleton<ViewModels.PanelViewModel>();
+            services.AddSingleton<ViewModels.ClientesViewModel>();
+            services.AddSingleton<ViewModels.ConfigViewModel>();
+
             services.AddTransient<ViewModels.PinViewModel>();
             services.AddTransient<ViewModels.NewPinViewModel>();
-            services.AddTransient<ViewModels.PagosViewModel>();
+
+            Log.Information("Servicios de la aplicacion configurados");
         }
     }
 }

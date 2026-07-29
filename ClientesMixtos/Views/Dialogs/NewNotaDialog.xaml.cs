@@ -10,7 +10,7 @@ namespace ClientesMixtos.Views.Dialogs
             InitializeComponent();
             DataContext = vm;
 
-            vm.CerrarVentana = (resultado) => DialogResult = resultado;
+            vm.CloseRequested += (r) => DialogResult = r;
         }
     }
 }

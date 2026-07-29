@@ -7,11 +7,9 @@ namespace ClientesMixtos.Models
     public class Nota
     {
         [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } = string.Empty;
+        public ObjectId Id { get; set; }
 
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string ClienteId { get; set; } = string.Empty;
+        public ObjectId ClienteId { get; set; }
 
         public string Descripcion { get; set; } = string.Empty;
         public string FechaCreacion {  get; set; } = string.Empty;

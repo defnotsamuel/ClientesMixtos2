@@ -5,13 +5,14 @@ namespace ClientesMixtos.Views.Dialogs
 {
     public partial class PagosDialog : Window
     {
-        public PagosViewModel vm;
+        private readonly PagosViewModel _vm;
+
         public PagosDialog(PagosViewModel vm)
         {
             InitializeComponent();
 
             DataContext = vm;
-            this.vm = vm;
+            _vm = vm;
         }
 
         private void Cerrar_Click(object sender, RoutedEventArgs e)

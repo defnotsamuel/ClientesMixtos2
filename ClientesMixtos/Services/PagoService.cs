@@ -3,26 +3,32 @@ using ClientesMixtos.Repos;
 using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace ClientesMixtos.Services
 {
-    public class PagoService(PagoRepo repository)
+    public class PagoService : IPagoService
     {
-        private readonly PagoRepo _repository = repository;
+        private readonly IPagoRepo _repo;
 
-        public Task<List<Pago>> GetHistorial(string clienteId)
+        public PagoService(IPagoRepo repo)
         {
-            return _repository.GetByClienteId(clienteId);
+            _repo = repo;
         }
 
-        public async Task<bool> ExistePago(string clienteId, DateTime fechaPagada)
+        public Task<List<Pago>> GetHistorial(ObjectId clienteId)
         {
-            return await _repository.GetByFecha(clienteId, fechaPagada) is not null;
+            return _repo.GetByClienteId(clienteId);
+        }
+
+        public async Task<bool> ExistePago(ObjectId clienteId, DateTime fechaPagada)
+        {
+            return await _repo.GetByFecha(clienteId, fechaPagada) is not null;
         }
 
         public async Task<Pago?> RegistrarPago(
-            string clienteId,
+            ObjectId clienteId,
             DateTime fechaPagada,
             DateTime? fechaMarcado = null)
         {
@@ -36,7 +42,7 @@ namespace ClientesMixtos.Services
                 FechaMarcado = fechaMarcado
             };
 
-            await _repository.Insert(pago);
+            await _repo.Insert(pago);
             return pago;
         }
 
@@ -75,14 +81,14 @@ namespace ClientesMixtos.Services
 
             if (pagos.Count > 0)
             {
-                pagos.Reverse(); // Opcional: guardar de julio hacia adelante
-                await _repository.InsertMany(pagos);
+                pagos.Reverse();
+                await _repo.InsertMany(pagos);
             }
         }
 
         public Task EliminarPago(ObjectId id)
         {
-            return _repository.Delete(id);
+            return _repo.Delete(id);
         }
 
         public async Task CrearPagoDesdeFechaMarcada(Cliente cliente)
@@ -90,6 +96,8 @@ namespace ClientesMixtos.Services
             if (cliente.State.FechaDeCompra is null ||
                 cliente.State.FechaMarcada is null)
                 return;
+
+            var stopWatch = Stopwatch.StartNew();
 
             DateTime fechaCompra = cliente.State.FechaDeCompra.Value.Date;
             DateTime fechaMarcada = cliente.State.FechaMarcada.Value.Date;
@@ -103,19 +111,24 @@ namespace ClientesMixtos.Services
                 fechaMarcada.Month,
                 diaPago);
 
-            var existente = await _repository.GetByFecha(
+            var existente = await _repo.GetByFecha(
                 cliente.ClienteId,
                 fechaPagada);
 
             if (existente is not null)
                 return;
 
-            await _repository.Insert(new Pago
+            await _repo.Insert(new Pago
             {
                 ClienteId = cliente.ClienteId,
                 FechaPagada = fechaPagada,
                 FechaMarcado = fechaMarcada
             });
+
+            stopWatch.Stop();
+            var end = stopWatch.ElapsedMilliseconds;
+
+
         }
     }
 }

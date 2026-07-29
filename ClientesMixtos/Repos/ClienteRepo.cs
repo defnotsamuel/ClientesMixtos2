@@ -1,15 +1,19 @@
 ﻿using ClientesMixtos.DB;
 using ClientesMixtos.Models;
 using MongoDB.Driver;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ClientesMixtos.Repos
 {
-    public class ClienteRepo(MongoContext context)
+    public class ClienteRepo : IClienteRepo
     {
-        private readonly IMongoCollection<Cliente> _collection = context.GetCollection<Cliente>("clientes");
+        private readonly IMongoCollection<Cliente> _collection;
+
+        public ClienteRepo(IMongoContext context)
+        {
+            _collection = context.GetCollection<Cliente>("clientes");
+        }
 
         public Task<List<Cliente>> GetAll()
         {

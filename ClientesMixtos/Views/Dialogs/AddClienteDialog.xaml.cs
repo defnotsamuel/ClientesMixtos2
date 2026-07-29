@@ -5,19 +5,18 @@ namespace ClientesMixtos.Views.Dialogs
 {
     public partial class AddClienteDialog : Window
     {
-
-        private ViewModels.AddClienteViewModel vm;
+        private readonly ViewModels.AddClienteViewModel _vm;
 
         public AddClienteDialog(ViewModels.AddClienteViewModel vm)
         {
             InitializeComponent();
 
-            this.vm = vm;
-            vm.CloseRequested += ((r) => DialogResult = r);
+            _vm = vm;
+            _vm.CloseRequested += (r) => DialogResult = r;
 
             DataContext = vm;
         }
 
-        public Cliente GetCliente() => vm.Cliente;
+        public Cliente GetCliente() => _vm.Cliente;
     }
 }

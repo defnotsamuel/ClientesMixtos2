@@ -1,16 +1,10 @@
 ﻿using ClientesMixtos.Models;
-using ClientesMixtos.Repos;
 using ClientesMixtos.Services;
 using ClientesMixtos.Views.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
@@ -18,38 +12,53 @@ namespace ClientesMixtos.ViewModels
 {
     public partial class ClientesViewModel : ObservableObject
     {
-        private readonly ClienteService _clienteService;
-        private readonly NotaService _notaService;
-        private readonly PagoService _pagoService;
+        private readonly IClienteService _clienteService;
+        private readonly INotaService _notaService;
+        private readonly IPagoService _pagoService;
 
         private readonly ObservableCollection<Cliente> _clientes = [];
 
         public ObservableCollection<string> Lotes { get; } = [];
-        public ICollectionView CClientesView { get; set; }
+        public ICollectionView FilteredClientesView { get; set; }
 
         [ObservableProperty]
-        private string _loteSeleccionado = "Todos";
+        private string _selectedLot = "Todos";
 
         [ObservableProperty]
-        private string _textoBusqueda = string.Empty;
+        private string _searchText = string.Empty;
 
         [ObservableProperty]
-        private Cliente? _clienteSeleccionado;
+        private Cliente? _selectedCliente;
 
-        public bool HasSelectedClient => ClienteSeleccionado != null;
+        public bool HasSelectedClient => SelectedCliente != null;
 
-        partial void OnClienteSeleccionadoChanged(Cliente? value)
+        partial void OnSelectedClienteChanged(Cliente? value)
         {
             OnPropertyChanged(nameof(HasSelectedClient));
+        }
+
+        public ClientesViewModel(IClienteService clienteService, INotaService notaService, IPagoService pagoService)
+        {
+            _clienteService = clienteService;
+            _notaService = notaService;
+            _pagoService = pagoService;
+
+            FilteredClientesView = CollectionViewSource.GetDefaultView(_clientes);
+
+            _ = LoadDataAsync();
+        }
+
+        private ObservableCollection<string> GetLotesWithoutTodos()
+        {
+            var lotes = new ObservableCollection<string>(Lotes);
+            lotes.Remove("Todos");
+            return lotes;
         }
 
         [RelayCommand]
         public void NewLote(object? target)
         {
-            var lotes = new ObservableCollection<string>(Lotes);
-            lotes.Remove("Todos");
-
-            var model = new NewLoteViewModel(lotes);
+            var model = new NewLoteViewModel(GetLotesWithoutTodos());
             var newLoteView = new NewLoteDialog(model);
             if (newLoteView.ShowDialog() ?? false)
             {
@@ -61,18 +70,13 @@ namespace ClientesMixtos.ViewModels
         [RelayCommand]
         public async Task Add()
         {
-            var lotes = new ObservableCollection<string>(Lotes);
-            lotes.Remove("Todos");
-
-            var model = new AddClienteViewModel(lotes);
+            var model = new AddClienteViewModel(GetLotesWithoutTodos());
             var addView = new AddClienteDialog(model);
 
             if (addView.ShowDialog() ?? false)
             {
                 var cliente = model.Cliente;
-
                 await _clienteService.AddCliente(cliente);
-
                 _clientes.Add(cliente);
             }
         }
@@ -81,13 +85,10 @@ namespace ClientesMixtos.ViewModels
         public async Task Delete(Cliente cliente)
         {
             if (MessageBoxResult.Yes != MessageBox.Show($"¿Está seguro de eliminar al cliente {cliente.Nombre}?", "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning))
-            {
                 return;
-            }
 
             await _notaService.DeleteByClienteId(cliente.ClienteId);
             await _clienteService.DeleteCliente(cliente);
-
             _clientes.Remove(cliente);
         }
 
@@ -105,36 +106,30 @@ namespace ClientesMixtos.ViewModels
             if (dialog.ShowDialog() != true) return;
 
             await _clienteService.MarcarCliente(cliente, dialogVm.Meses);
-            CClientesView.Refresh();
+            FilteredClientesView.Refresh();
         }
 
         [RelayCommand]
         public async Task MarkAsPaid(Cliente cliente)
         {
             if (MessageBoxResult.Yes != MessageBox.Show($"¿Está seguro de saldar al cliente {cliente.Nombre}?", "Confirmar", MessageBoxButton.YesNo, MessageBoxImage.Warning))
-            {
                 return;
-            }
 
             cliente.Saldado = true;
-
             await _clienteService.UpdateCliente(cliente);
-            CClientesView.Refresh();
+            FilteredClientesView.Refresh();
         }
 
         [RelayCommand]
         public async Task Edit(Cliente cliente)
         {
-            var lotes = new ObservableCollection<string>(Lotes);
-            lotes.Remove("Todos");
-
-            var model = new EditViewModel(cliente, lotes);
+            var model = new EditViewModel(cliente, GetLotesWithoutTodos());
             var editView = new EditClienteDialog(model);
 
             if (editView.ShowDialog() ?? false)
                 await _clienteService.UpdateCliente(cliente);
 
-            CClientesView.Refresh();
+            FilteredClientesView.Refresh();
         }
 
         [RelayCommand]
@@ -143,7 +138,6 @@ namespace ClientesMixtos.ViewModels
             var vm = new NotasViewModel(cliente, _notaService);
             await vm.LoadDataAsync();
             var notasView = new NotasDialog(vm);
-
             notasView.ShowDialog();
         }
 
@@ -156,16 +150,7 @@ namespace ClientesMixtos.ViewModels
             var pagosView = new PagosDialog(vm);
             pagosView.ShowDialog();
 
-            CClientesView.Refresh();
-        }
-
-        public ClientesViewModel(ClienteService clienteService, NotaService notaService, PagoService pagoService)
-        {
-            _clienteService = clienteService;
-            _notaService = notaService;
-            _pagoService = pagoService;
-
-            CClientesView = CollectionViewSource.GetDefaultView(_clientes);
+            FilteredClientesView.Refresh();
         }
 
         public async Task LoadDataAsync()
@@ -176,7 +161,6 @@ namespace ClientesMixtos.ViewModels
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-
                     Lotes.Clear();
                     Lotes.Add("Todos");
 
@@ -196,38 +180,35 @@ namespace ClientesMixtos.ViewModels
             {
                 throw;
             }
-
-            return;
         }
 
-        partial void OnLoteSeleccionadoChanged(string value) => CClientesView.Filter = FiltrarClientes;
+        partial void OnSelectedLotChanged(string value) => FilteredClientesView.Filter = FilterClientes;
+        partial void OnSearchTextChanged(string value) => FilteredClientesView.Filter = FilterClientes;
 
-        partial void OnTextoBusquedaChanged(string value) => CClientesView.Filter = FiltrarClientes;
-
-        private bool FiltrarLotes(object obj)
+        private bool FilterLotes(object obj)
         {
             if (obj is not Cliente cliente)
                 return false;
 
-            if (LoteSeleccionado == "Todos")
+            if (SelectedLot == "Todos")
                 return true;
 
-            return cliente.Lote == LoteSeleccionado;
+            return cliente.Lote == SelectedLot;
         }
 
-        private bool FiltrarClientes(object obj)
+        private bool FilterClientes(object obj)
         {
             if (obj is not Cliente cliente)
                 return false;
 
-            bool lote = FiltrarLotes(cliente);
+            bool lote = FilterLotes(cliente);
 
-            if (string.IsNullOrWhiteSpace(TextoBusqueda))
+            if (string.IsNullOrWhiteSpace(SearchText))
                 return lote;
 
-            return lote && (cliente.Nombre.Contains(TextoBusqueda, StringComparison.OrdinalIgnoreCase)
-                || cliente.Vehiculo.Contains(TextoBusqueda, StringComparison.OrdinalIgnoreCase)
-                || (cliente.Placa != null && cliente.Placa.Contains(TextoBusqueda, StringComparison.OrdinalIgnoreCase)));
+            return lote && (cliente.Nombre.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+                || cliente.Vehiculo.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+                || (cliente.Placa != null && cliente.Placa.Contains(SearchText, StringComparison.OrdinalIgnoreCase)));
         }
     }
 }

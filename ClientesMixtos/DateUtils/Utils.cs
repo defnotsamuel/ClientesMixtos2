@@ -2,13 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace ClientesMixtos.DateUtils
 {
-    public static class Utils
+    public class Utils : IDateUtils
     {
-        public static DateTime? ParseDate(string date)
+        public DateTime? ParseDate(string date)
         {
             bool success = DateTime.TryParseExact(
                     date,
@@ -20,31 +19,50 @@ namespace ClientesMixtos.DateUtils
             return success ? fechaPago : null;
         }
 
-        public static DateTime ObtenerProximaFechaPago(DateTime fechaCompra)
+        public DateTime GetNextPaymentDate(DateTime purchaseDate)
         {
-            fechaCompra = fechaCompra.Date;
+            purchaseDate = purchaseDate.Date;
             DateTime hoy = DateTime.Today;
 
-            // Si la compra aún no ocurre, el primer pago es un mes después.
-            if (fechaCompra > hoy)
-                return CrearFechaValida(fechaCompra.AddMonths(1), fechaCompra.Day);
+            if (purchaseDate > hoy)
+                return CreateValidDate(purchaseDate.AddMonths(1), purchaseDate.Day);
 
-            // Fecha de pago correspondiente al mes actual.
-            DateTime fechaPago = CrearFechaValida(hoy, fechaCompra.Day);
+            DateTime fechaPago = CreateValidDate(hoy, purchaseDate.Day);
 
-            // Si ya pasó este mes, mover al siguiente.
             if (fechaPago < hoy)
-                fechaPago = CrearFechaValida(hoy.AddMonths(1), fechaCompra.Day);
+                fechaPago = CreateValidDate(hoy.AddMonths(1), purchaseDate.Day);
 
             return fechaPago;
         }
 
-        public static DateTime CrearFechaValida(DateTime referencia, int diaDeseado)
+        public DateTime CreateValidDate(DateTime reference, int desiredDay)
         {
-            int dia = Math.Min(diaDeseado,
-                DateTime.DaysInMonth(referencia.Year, referencia.Month));
+            int dia = Math.Min(desiredDay,
+                DateTime.DaysInMonth(reference.Year, reference.Month));
 
-            return new DateTime(referencia.Year, referencia.Month, dia);
+            return new DateTime(reference.Year, reference.Month, dia);
+        }
+
+        public static bool ValidarFecha(string fechaTexto, bool force, out DateTime? result)
+        {
+            result = null;
+            if (string.IsNullOrEmpty(fechaTexto) && !force) return true;
+
+            bool esValida = DateTime.TryParse(fechaTexto, new CultureInfo("es-SV"), out var parsed);
+
+            if (!esValida)
+            {
+                System.Windows.MessageBox.Show(
+                    $"El valor ingresado ({fechaTexto}) no es una fecha válida.",
+                    "Error de formato",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Warning
+                );
+                return false;
+            }
+
+            result = parsed;
+            return true;
         }
     }
 }

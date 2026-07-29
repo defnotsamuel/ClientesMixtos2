@@ -1,21 +1,17 @@
-﻿using ClientesMixtos.Models;
+﻿using ClientesMixtos.DateUtils;
+using ClientesMixtos.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows;
 
 namespace ClientesMixtos.ViewModels
 {
-    public partial class EditViewModel : ObservableObject
+    public partial class EditViewModel : DialogViewModelBase
     {
+        private readonly Cliente _cliente;
 
-        private readonly Cliente cliente;
-        public Cliente Cliente => cliente;
         public ObservableCollection<string> Lotes { get; }
-
-        public event Action<bool?>? CloseRequested;
-
 
         [ObservableProperty]
         private string _nombre;
@@ -65,18 +61,15 @@ namespace ClientesMixtos.ViewModels
         [ObservableProperty]
         private string _refrenda = string.Empty;
 
- 
         public EditViewModel(Cliente cliente, ObservableCollection<string> lotes)
         {
-            this.cliente = cliente;
+            _cliente = cliente;
 
             Nombre = cliente.Nombre;
             Vehiculo = cliente.Vehiculo;
-
             Lote = cliente.Lote;
             Libro1 = cliente.Libro1;
             Libro2 = cliente.Libro2;
-
             Placa = cliente.Placa;
             FechaDeCompra = cliente.FechaDeCompra;
             FechaDePago = cliente.FechaDePago;
@@ -96,67 +89,41 @@ namespace ClientesMixtos.ViewModels
         [RelayCommand]
         public void Save()
         {
-            if (string.IsNullOrWhiteSpace(Nombre) || 
-                string.IsNullOrWhiteSpace(Vehiculo) || 
-                string.IsNullOrWhiteSpace(Placa) || 
-                string.IsNullOrWhiteSpace(Lote) || 
+            if (string.IsNullOrWhiteSpace(Nombre) ||
+                string.IsNullOrWhiteSpace(Vehiculo) ||
+                string.IsNullOrWhiteSpace(Placa) ||
+                string.IsNullOrWhiteSpace(Lote) ||
                 string.IsNullOrWhiteSpace(FechaDeCompra))
             {
                 MessageBox.Show("Por favor, complete todos los campos obligatorios.", "Campos incompletos", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            if (!ValidarFecha(FechaDeCompra, true, out var fechaCompra))
+            if (!Utils.ValidarFecha(FechaDeCompra, true, out var fechaCompra))
                 return;
 
-            if (!(ValidarFecha(FechaDePago, false, out var fechaPago) &&
-                ValidarFecha(FechaMarcada, false, out var fechaMarcada) &&
-                ValidarFecha(FechaVence, false, out var fechaVence)))
+            if (!(Utils.ValidarFecha(FechaDePago, false, out var fechaPago) &&
+                Utils.ValidarFecha(FechaMarcada, false, out var fechaMarcada) &&
+                Utils.ValidarFecha(FechaVence, false, out var fechaVence)))
                 return;
 
-            cliente.Lote = Lote;
-            cliente.Libro1 = Libro1;
-            cliente.Libro2 = Libro2;
+            _cliente.Lote = Lote;
+            _cliente.Libro1 = Libro1;
+            _cliente.Libro2 = Libro2;
+            _cliente.Nombre = Nombre;
+            _cliente.Vehiculo = Vehiculo;
+            _cliente.Placa = Placa;
+            _cliente.FechaDeCompra = fechaCompra?.ToString("dd/MM/yyyy") ?? "";
+            _cliente.FechaDePago = fechaPago?.ToString("dd/MM/yyyy") ?? "";
+            _cliente.FechaMarcada = fechaMarcada?.ToString("dd/MM/yyyy") ?? "";
+            _cliente.FechaVence = fechaVence?.ToString("dd/MM/yyyy") ?? "";
+            _cliente.Perdido = Perdido;
+            _cliente.Recuperado = Recuperado;
+            _cliente.Telefono = Telefono;
+            _cliente.Ciudad = Ciudad;
+            _cliente.Refrenda = Refrenda;
 
-            cliente.Nombre = Nombre;
-            cliente.Vehiculo = Vehiculo;
-            cliente.Placa = Placa;
-
-            cliente.FechaDeCompra = fechaCompra?.ToString("dd/MM/yyyy") ?? "";
-            cliente.FechaDePago = fechaPago?.ToString("dd/MM/yyyy") ?? "";
-            cliente.FechaMarcada = fechaMarcada?.ToString("dd/MM/yyyy") ?? "";
-            cliente.FechaVence = fechaVence?.ToString("dd/MM/yyyy") ?? "";
-
-            cliente.Perdido = Perdido;
-            cliente.Recuperado = Recuperado;
-
-            cliente.Telefono = Telefono;
-            cliente.Ciudad = Ciudad;
-            cliente.Refrenda = Refrenda;
-
-            CloseRequested?.Invoke(true);
-        }
-
-        private static bool ValidarFecha(string fechaTexto, bool force, out DateTime? result)
-        {
-            result = null;
-            if (string.IsNullOrEmpty(fechaTexto) && !force) return true;
-
-            bool esValida = DateTime.TryParse(fechaTexto, new CultureInfo("es-SV"), out var parsed);
-
-            if (!esValida)
-            {
-                MessageBox.Show(
-                    $"El valor ingresado ({fechaTexto}) no es una fecha válida.",
-                    "Error de formato",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning
-                );
-                return false;
-            }
-
-            result = parsed;
-            return true;
+            RequestClose(true);
         }
     }
 }

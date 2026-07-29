@@ -10,12 +10,8 @@ namespace ClientesMixtos.Models
     {
         [BsonId]
         public ObjectId Id { get; set; }
-
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string ClienteId { get; set; } = null!;
-
+        public ObjectId ClienteId { get; set; }
         public DateTime FechaPagada { get; set; }
-
         public DateTime? FechaMarcado { get; set; }
     }
 }

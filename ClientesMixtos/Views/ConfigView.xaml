@@ -46,19 +46,6 @@
                     </StackPanel>
                 </Border>
 
-                <Border Background="{DynamicResource BrushSurfaceLight}" CornerRadius="8" Margin="0,16,0,0"
-            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" Padding="20">
-                    <StackPanel>
-                        <TextBlock Text="Apariencia" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
-                        <TextBlock Text="Cambiar entre tema claro y oscuro" 
-                       FontSize="12" Foreground="{DynamicResource BrushTextMuted}" Margin="0,4,0,12"/>
-                        <CheckBox Content="Modo Oscuro" 
-                      IsChecked="{Binding IsDarkMode}"
-                      Style="{StaticResource ModernCheckBoxStyle}"
-                      Margin="0,0,0,6"/>
-                    </StackPanel>
-                </Border>
-
                 <Button Content="Guardar Configuración" Width="180" Height="38"
                         Command="{Binding SaveConfigCommand}"
                         Style="{StaticResource ActionButtonStyle}"

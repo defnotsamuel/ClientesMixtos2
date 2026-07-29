@@ -1,25 +1,21 @@
-﻿using MongoDB.Driver;
+﻿using ClientesMixtos.Configuration;
+using MongoDB.Driver;
 
 namespace ClientesMixtos.DB
 {
-    public class MongoContext
+    public class MongoContext : IMongoContext
     {
         public IMongoDatabase Database { get; private set; }
 
-        public MongoContext()
+        public MongoContext(GlobalConfig config)
         {
-            var connectionString = Configuration.GlobalConfig.ConnectionString();
-            var databaseName = Configuration.GlobalConfig.DatabaseName();
-
-            var client = new MongoClient(connectionString);
-
-            Database = client.GetDatabase(databaseName);
+            var client = new MongoClient(config.ConnectionString);
+            Database = client.GetDatabase(config.DatabaseName);
         }
 
         public IMongoCollection<T> GetCollection<T>(string collectionName)
         {
             return Database.GetCollection<T>(collectionName);
         }
-
     }
 }

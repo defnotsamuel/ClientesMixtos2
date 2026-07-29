@@ -5,7 +5,7 @@ using System.Windows;
 
 namespace ClientesMixtos.ViewModels
 {
-    public partial class NotaFormViewModel: ObservableObject
+    public partial class NotaFormViewModel : DialogViewModelBase
     {
         private readonly Nota? _notaOriginal;
 
@@ -15,7 +15,6 @@ namespace ClientesMixtos.ViewModels
         [ObservableProperty]
         private DateTime? _fechaCreacion;
 
-        public Action<bool>? CerrarVentana;
         public Nota? NotaResultado { get; private set; }
 
         public NotaFormViewModel(Nota? notaExistente = null)
@@ -70,13 +69,13 @@ namespace ClientesMixtos.ViewModels
                 NotaResultado.State.FechaCreacion = FechaCreacion;
             }
 
-            CerrarVentana?.Invoke(true);
+            RequestClose(true);
         }
 
         [RelayCommand]
         private void Cancelar()
         {
-            CerrarVentana?.Invoke(false);
+            RequestClose(false);
         }
     }
 }

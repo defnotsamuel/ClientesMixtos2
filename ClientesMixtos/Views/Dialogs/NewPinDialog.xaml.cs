@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ClientesMixtos.Services;
+using ClientesMixtos.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -17,9 +19,13 @@ namespace ClientesMixtos.Views.Dialogs
     /// </summary>
     public partial class NewPinDialog : Window
     {
-        public NewPinDialog()
+        public NewPinDialog(NewPinViewModel vm)
         {
             InitializeComponent();
+
+            DataContext = vm;
+
+            vm.CloseRequested += (r) => DialogResult = r;
         }
     }
 }

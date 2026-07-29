@@ -9,8 +9,7 @@ namespace ClientesMixtos.Models
     {
 
         [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string ClienteId { get; set; } = string.Empty;
+        public ObjectId ClienteId { get; set; }
 
         [BsonElement("LIBRO 1")]
         public string Libro1 { get; set; } = string.Empty;

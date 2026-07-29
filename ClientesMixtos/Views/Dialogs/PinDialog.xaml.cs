@@ -21,6 +21,8 @@ namespace ClientesMixtos.Views.Dialogs
         public PinDialog(PinViewModel vm)
         {
             InitializeComponent();
+
+            vm.CloseRequested += (r) => DialogResult = r;
             DataContext = vm;
         }
     }

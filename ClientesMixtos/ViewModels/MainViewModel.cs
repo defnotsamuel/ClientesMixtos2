@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using ClientesMixtos.DB;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
@@ -19,23 +20,21 @@ namespace ClientesMixtos.ViewModels
         [ObservableProperty]
         private string _connectionStatusColor = "#6B7280";
 
-        private readonly DB.MongoContext _context;
+        private readonly IMongoContext _context;
         private readonly IServiceProvider _serviceProvider;
 
         [RelayCommand]
         public void ShowPanel()
         {
             var vm = _serviceProvider.GetRequiredService<PanelViewModel>();
-            _ = vm.LoadDataAsync();
             CurrentView = vm;
         }
 
         [RelayCommand]
-        public async Task ShowClientes()
+        public void ShowClientes()
         {
             var vm = _serviceProvider.GetRequiredService<ClientesViewModel>();
             CurrentView = vm;
-            await vm.LoadDataAsync();
         }
 
         [RelayCommand]
@@ -76,13 +75,12 @@ namespace ClientesMixtos.ViewModels
             }
         }
 
-        public MainViewModel(DB.MongoContext context, IServiceProvider serviceProvider)
+        public MainViewModel(IMongoContext context, IServiceProvider serviceProvider)
         {
             _context = context;
             _serviceProvider = serviceProvider;
 
             var panelVm = _serviceProvider.GetRequiredService<PanelViewModel>();
-            _ = panelVm.LoadDataAsync();
             CurrentView = panelVm;
 
             _ = CheckConnectionAsync();
